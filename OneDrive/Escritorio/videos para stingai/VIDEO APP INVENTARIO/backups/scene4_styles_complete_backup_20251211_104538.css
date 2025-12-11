@@ -1,0 +1,266 @@
+/* ESCENA 4: BLUE - La App Hermosa */
+
+/* Fondo y grid de la escena 4 */
+#scene4 {
+    background: linear-gradient(135deg, #0a1628 0%, #0f172a 100%);
+}
+
+.blue-grid {
+    position: absolute;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    background-image:
+        linear-gradient(to right, rgba(59, 130, 246, 0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(59, 130, 246, 0.06) 1px, transparent 1px);
+    background-size: 30px 30px;
+    transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-100px);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.scene.active .blue-grid {
+    animation: gridDrift 20s linear infinite;
+}
+
+/* Mockup del teléfono */
+.phone-mockup {
+    position: absolute;
+    top: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 360px;
+    height: 75%;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-radius: 24px;
+    border: 3px solid #334155;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    z-index: 20;
+    opacity: 0;
+}
+
+.scene.active .phone-mockup {
+    animation: phonePop 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 0.8s;
+}
+
+@keyframes phonePop {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.85) translateY(50px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1) translateY(0);
+    }
+}
+
+/* Header de la app */
+.app-header {
+    padding: 24px 20px 16px 20px;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-bottom: 1px solid #334155;
+}
+
+.app-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.app-subtitle {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Scroll de productos con animación */
+.products-scroll {
+    padding: 16px;
+    height: calc(100% - 100px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.scene.active .products-scroll {
+    animation: scrollProducts 8s linear infinite 2s;
+}
+
+@keyframes scrollProducts {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-50px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* Tarjetas de productos */
+.product-card {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.product-image {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.product-info {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.product-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin-bottom: 2px;
+}
+
+.product-sku {
+    font-size: 0.65rem;
+    color: #64748b;
+    font-family: 'Courier New', monospace;
+}
+
+.product-price {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #3b82f6;
+    flex-shrink: 0;
+}
+
+/* Título y subtítulo de escena 4 */
+.scene4-title {
+    font-weight: 900;
+    font-size: 2.2rem;
+    line-height: 1.1;
+    text-transform: uppercase;
+    letter-spacing: -1.3px;
+    margin-bottom: 12px;
+    opacity: 0;
+}
+
+.scene.active .scene4-title {
+    animation: titleZoom 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 2.2s;
+}
+
+@keyframes titleZoom {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+        filter: blur(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: blur(0);
+    }
+}
+
+.scene4-subtitle {
+    font-size: 0.9rem;
+    color: #a1a1aa;
+    font-weight: 500;
+    line-height: 1.5;
+    opacity: 0;
+}
+
+.scene.active .scene4-subtitle {
+    animation: subtitleSlide 1s ease-out forwards 2.8s;
+}
+
+@keyframes subtitleSlide {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Efecto glow azul */
+.blue-glow {
+    color: #3b82f6;
+    text-shadow: 0 0 25px rgba(59, 130, 246, 1), 0 0 50px rgba(59, 130, 246, 0.6);
+    animation: bluePulse 2.5s ease-in-out infinite;
+}
+
+@keyframes bluePulse {
+
+    0%,
+    100% {
+        text-shadow: 0 0 25px rgba(59, 130, 246, 1), 0 0 50px rgba(59, 130, 246, 0.6);
+    }
+
+    50% {
+        text-shadow: 0 0 35px rgba(59, 130, 246, 1), 0 0 70px rgba(59, 130, 246, 0.8);
+    }
+}
+
+/* Cuadro semitransparente para el texto de escena 4 */
+.scene4-text-container {
+    position: absolute;
+    bottom: 14%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 380px;
+    background: rgba(10, 22, 40, 0.88);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    border-radius: 20px;
+    padding: 24px 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+    z-index: 40;
+    opacity: 0;
+    text-align: center;
+}
+
+.scene.active .scene4-text-container {
+    animation: textBoxFade 1s ease-out forwards 1.8s;
+}
+
+@keyframes textBoxFade {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(25px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}

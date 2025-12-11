@@ -1,0 +1,200 @@
+/* ESCENA 2: ORANGE - Peleando con Excel */
+
+/* Fondo y grid de la escena 2 */
+#scene2 {
+    background: linear-gradient(135deg, #c2410c 0%, #7c2d12 100%);
+}
+
+.orange-grid {
+    position: absolute;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    background-image:
+        linear-gradient(to right, rgba(251, 146, 60, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(251, 146, 60, 0.08) 1px, transparent 1px);
+    background-size: 30px 30px;
+    transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-100px);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.scene.active .orange-grid {
+    animation: gridDrift 20s linear infinite;
+}
+
+/* Excel container */
+.excel-container {
+    position: absolute;
+    top: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 88%;
+    max-width: 360px;
+    background: rgba(20, 20, 20, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(251, 146, 60, 0.3);
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    z-index: 20;
+    opacity: 0;
+}
+
+.scene.active .excel-container {
+    animation: excelPop 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 0.6s;
+}
+
+@keyframes excelPop {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.9) translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) scale(1) translateY(0);
+    }
+}
+
+.excel-header {
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #1f1f1f 0%, #141414 100%);
+    border-bottom: 1px solid rgba(251, 146, 60, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 8px 8px 0 0;
+}
+
+.excel-dot {
+    width: 12px;
+    height: 12px;
+    background: #fb923c;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(251, 146, 60, 0.6);
+}
+
+.excel-title {
+    font-size: 0.75rem;
+    color: #fdba74;
+    font-weight: 600;
+    font-family: 'Arial', sans-serif;
+}
+
+.excel-grid {
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 400px;
+    overflow: hidden;
+}
+
+.excel-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 0.7fr;
+    gap: 2px;
+}
+
+.excel-cell {
+    background: rgba(30, 30, 30, 0.6);
+    border: 1px solid rgba(251, 146, 60, 0.15);
+    padding: 8px 6px;
+    font-size: 0.7rem;
+    color: #fef3c7;
+    font-family: 'Courier New', monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.excel-cell.header {
+    background: rgba(251, 146, 60, 0.2);
+    font-weight: 700;
+    text-align: center;
+    color: #fb923c;
+}
+
+.excel-cursor {
+    position: absolute;
+    bottom: 30%;
+    right: 15%;
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 18px solid #fb923c;
+    opacity: 0;
+    filter: drop-shadow(0 5px 15px rgba(251, 146, 60, 0.8));
+}
+
+.scene.active .excel-cursor {
+    animation: cursorBlink 1.2s ease-in-out infinite 1.5s;
+}
+
+@keyframes cursorBlink {
+
+    0%,
+    100% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+/* Estilos de título escena 2 */
+.scene2-title {
+    font-weight: 900;
+    font-size: 2.4rem;
+    line-height: 1.05;
+    text-transform: uppercase;
+    letter-spacing: -1.4px;
+    opacity: 0;
+    text-shadow: 0 5px 25px rgba(0, 0, 0, 0.8);
+}
+
+.scene.active .scene2-title {
+    animation: titleShake 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 1.8s;
+}
+
+@keyframes titleShake {
+    0% {
+        opacity: 0;
+        transform: scale(0.85) translateY(20px) rotate(-2deg);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0) rotate(0deg);
+    }
+}
+
+.scene2-subtitle {
+    opacity: 0;
+}
+
+.scene.active .scene2-subtitle {
+    animation: subtitleSlide 1s ease-out forwards 2.4s;
+}
+
+/* Orange glow effect */
+.orange-glow {
+    color: #fb923c;
+    text-shadow: 0 0 30px rgba(251, 146, 60, 1), 0 0 60px rgba(251, 146, 60, 0.7);
+    animation: orangePulse 2.5s ease-in-out infinite;
+}
+
+@keyframes orangePulse {
+
+    0%,
+    100% {
+        text-shadow: 0 0 30px rgba(251, 146, 60, 1), 0 0 60px rgba(251, 146, 60, 0.7);
+    }
+
+    50% {
+        text-shadow: 0 0 40px rgba(251, 146, 60, 1), 0 0 80px rgba(251, 146, 60, 0.9);
+    }
+}

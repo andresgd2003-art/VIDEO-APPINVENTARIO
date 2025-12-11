@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sting AI - Inventario App Reel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="base_styles.css">
+    <link rel="stylesheet" href="scene1_styles.css">
+    <link rel="stylesheet" href="scene2_styles.css">
+    <link rel="stylesheet" href="scene3_styles.css">
+    <link rel="stylesheet" href="scene4_styles_complete.css">
+    <link rel="stylesheet" href="scene5_styles.css">
+</head>
+
+<body>
+    <div class="video-container" id="reel-container">
+
+        <!-- SCENE 1: PURPLE -->
+        <div class="scene active" id="scene1">
+            <div class="purple-grid"></div>
+            <div class="paper-texture"></div>
+            <div class="vignette"></div>
+
+            <div class="brand-mark">
+                <div class="brand-dot"></div>
+                <span class="brand-text">Sting AI</span>
+            </div>
+
+            <div class="notebook-container">
+                <div class="notebook-page">
+                    <div class="notebook-lines"></div>
+                    <div class="handwritten-list">
+                        <div class="item-line">
+                            <span>Martillo 12"</span>
+                            <span class="crossed-out">$250</span>
+                        </div>
+                        <div class="item-line">
+                            <span>Llave inglesa</span>
+                            <span class="messy-price">$180</span>
+                        </div>
+                        <div class="item-line crossed-out">
+                            <span>Desarmador</span>
+                            <span>$???</span>
+                        </div>
+                        <div class="item-line">
+                            <span>Cinta métrica</span>
+                            <span class="price-question">$???</span>
+                        </div>
+                        <div class="item-line">
+                            <span>Taladro</span>
+                            <span style="color: #6b7280;">¿cuánto?</span>
+                        </div>
+                    </div>
+                    <div class="ink-stain"></div>
+                </div>
+                <div class="searching-finger">👉</div>
+            </div>
+
+            <div class="impact-text">
+                <h1 class="main-title">
+                    ¿AÚN EN <br>
+                    <span class="purple-glow">PAPEL?</span>
+                </h1>
+                <p class="subtitle">
+                    Buscando precios entre <br>
+                    <span class="emphasis">tachaduras</span> y papel...
+                </p>
+            </div>
+
+            <div class="nav-indicator">
+                <div class="nav-dot active"></div>
+                <div class="nav-dot"></div>
+                <div class="nav-dot"></div>
+                <div class="nav-dot"></div>
+            </div>
+            <div class="nav-hint">Click o ← → para navegar</div>
+        </div>
+
+        <!-- SCENE 2: ORANGE -->
+        <div class="scene" id="scene2">
+            <div class="orange-grid"></div>
+            <div class="vignette"></div>
+
+            <div class="brand-mark">
+                <div class="brand-dot"></div>
+                <span class="brand-text">Sting AI</span>
+            </div>
+
+            <div class="excel-container">
+                <div class="excel-header">
+                    <div class="excel-dot"></div>
+                    <div class="excel-title">Inventario_Final_V3_REAL.xlsx</div>
+                </div>
+                <div class="excel-grid">
+                    <div class="excel-row">
+                        <div class="excel-cell header">A</div>
+                        <div class="excel-cell header">B</div>
+                        <div class="excel-cell header">C</div>
+                        <div class="excel-cell header">D</div>
+                    </div>
+                    <div class="excel-row">
+                        <div class="excel-cell">SKU-1001</div>
+                        <div class="excel-cell">Producto A</div>
+                        <div class="excel-cell">$299.00</div>
+                        <div class="excel-cell">15</div>
+                    </div>
+                    <div class="excel-row">
+                        <div class="excel-cell">SKU-1002</div>
+                        <div class="excel-cell">Producto B muy largo que no</div>
+                        <div class="excel-cell">$1,450.50</div>
+                        <div class="excel-cell">8</div>
+                    </div>
+                    <div class="excel-row">
+                        <div class="excel-cell">SKU-1003</div>
+                        <div class="excel-cell">Producto C</div>
+                        <div class="excel-cell">$89.99</div>
+                        <div class="excel-cell">3</div>
+                    </div>
+                    <div class="excel-row">
+                        <div class="excel-cell">SKU-1004</div>
+                        <div class="excel-cell">Producto D Especial</div>
+                        <div class="excel-cell">???</div>
+                        <div class="excel-cell">???</div>
+                    </div>
+                    <div class="excel-row">
+                        <div class="excel-cell">SKU-1005</div>
+                        <div class="excel-cell">Otro producto largo sin</div>
+                        <div class="excel-cell">$2,300</div>
+                        <div class="excel-cell">1</div>
+                    </div>
+                    <div class="excel-row">
+                        <div class="excel-cell">SKU-1006</div>
+                        <div class="excel-cell">Producto F</div>
+                        <div class="excel-cell">$175.00</div>
+                        <div class="excel-cell">25</div>
+                    </div>
+                </div>
+                <div class="excel-cursor"></div>
+            </div>
+
+            <div class="impact-text">
+                <h1 class="scene2-title">
+                    ¿O PELEANDO CON <br>
+                    <span class="orange-glow">CELDAS?</span>
+                </h1>
+                <p class="subtitle scene2-subtitle">
+                    Perdiendo tiempo en <br>
+                    <span class="emphasis">filas infinitas</span> de Excel...
+                </p>
+            </div>
+
+            <div class="nav-indicator">
+                <div class="nav-dot"></div>
+                <div class="nav-dot active"></div>
+                <div class="nav-dot"></div>
+                <div class="nav-dot"></div>
+            </div>
+            <div class="nav-hint">Click o ← → para navegar</div>
+        </div>
+
+        <!-- SCENE 3: GREEN -->
+        <div class="scene" id="scene3">
+            <div class="green-grid"></div>
+            <div class="vignette"></div>
+            <div class="glitch-overlay"></div>
+
+            <div class="brand-mark">
+                <div class="brand-dot"></div>
+                <span class="brand-text">Sting AI</span>
+            </div>
+
+            <div class="magic-cell-container">
+                <div class="explosion-ring"></div>
+                <div class="explosion-ring"></div>
+                <div class="explosion-ring"></div>
+
+                <div class="excel-cell-magic">
+                    SKU-?????
+                </div>
+
+                <div class="app-icon">
+                    <div class="app-icon-symbol">📱</div>
+                    <div class="app-icon-label">INVENTORY</div>
+                </div>
+            </div>
+
+            <div class="sparkles-container">
+                <div class="sparkle"></div>
+                <div class="sparkle"></div>
+                <div class="sparkle"></div>
+                <div class="sparkle"></div>
+                <div class="sparkle"></div>
+                <div class="sparkle"></div>
+            </div>
+
+            <div class="impact-text">
+                <h1 class="scene3-title">
+                    ¡DALE UNA <br>
+                    <span class="green-glow">CARA NUEVA!</span>
+                </h1>
+                <p class="subtitle">
+                    Transforma tus datos en <br>
+                    <span class="emphasis">algo hermoso</span>
+                </p>
+            </div>
+
+            <div class="nav-indicator">
+                <div class="nav-dot"></div>
+                <div class="nav-dot"></div>
+                <div class="nav-dot active"></div>
+                <div class="nav-dot"></div>
+            </div>
+            <div class="nav-hint">Click o ← → para navegar</div>
+        </div>
+
+        <!-- SCENE 4: BLUE -->
+        <div class="scene" id="scene4">
+            <div class="blue-grid"></div>
+            <div class="vignette"></div>
+
+            <div class="brand-mark">
+                <div class="brand-dot"></div>
+                <span class="brand-text">Sting AI</span>
+            </div>
+
+            <div class="phone-mockup">
+                <div class="app-header">
+                    <div class="app-title">Mi Inventario</div>
+                    <div class="app-subtitle">48 productos registrados</div>
+                </div>
+                <div class="products-scroll">
+                    <div class="product-card">
+                        <div class="product-image">🔨</div>
+                        <div class="product-info">
+                            <div>
+                                <div class="product-name">Martillo Profesional 12"</div>
+                                <div class="product-sku">SKU-1001</div>
+                            </div>
+                            <div class="product-price">$250</div>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-image">🔧</div>
+                        <div class="product-info">
+                            <div>
+                                <div class="product-name">Llave Inglesa Ajustable</div>
+                                <div class="product-sku">SKU-1002</div>
+                            </div>
+                            <div class="product-price">$180</div>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-image">🪛</div>
+                        <div class="product-info">
+                            <div>
+                                <div class="product-name">Set Destornilladores</div>
+                                <div class="product-sku">SKU-1003</div>
+                            </div>
+                            <div class="product-price">$145</div>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-image">📏</div>
+                        <div class="product-info">
+                            <div>
+                                <div class="product-name">Cinta Métrica 5m</div>
+                                <div class="product-sku">SKU-1004</div>
+                            </div>
+                            <div class="product-price">$89</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="low-stock-alert">
+                    <div class="alert-icon">⚠️</div>
+                    <div class="alert-content">
+                        <div class="alert-title">Alerta de Stock</div>
+                        <div class="alert-desc"><b>4 productos</b> bajos de stock</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="impact-text">
+                <h1 class="scene4-title">
+                    ADIÓS EXCEL, <br>
+                    <span class="blue-glow">HOLA APP</span>
+                </h1>
+                <p class="subtitle scene4-subtitle">
+                    Datos difíciles ahora son un <br>
+                    <span class="emphasis">catálogo visual</span> fácil de usar
+                </p>
+            </div>
+
+            <div class="nav-indicator">
+                <div class="nav-dot"></div>
+                <div class="nav-dot"></div>
+                <div class="nav-dot"></div>
+                <div class="nav-dot active"></div>
+            </div>
+            <div class="nav-hint">Click o ← → para navegar</div>
+        </div>
+
+        <!-- SCENE 5: RED (Alerts) -->
+        <div class="scene" id="scene5">
+            <div class="red-grid"></div>
+            <div class="vignette"></div>
+
+            <div class="brand-mark">
+                <div class="brand-dot"></div>
+                <span class="brand-text">Sting AI</span>
+            </div>
+
+            <div class="phone-mockup">
+                <div class="app-header">
+                    <div class="app-title">Notificaciones</div>
+                </div>
+                <!-- Blurred background list of products -->
+                <div class="products-scroll" style="filter: blur(2px);">
+                    <div class="product-card">
+                        <div class="product-image">🔨</div>
+                        <div class="product-info">
+                            <div>
+                                <div class="product-name">Martillo</div>
+                            </div>
+                            <div class="product-price">$250</div>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-image">🔧</div>
+                        <div class="product-info">
+                            <div>
+                                <div class="product-name">Llave</div>
+                            </div>
+                            <div class="product-price">$180</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Big Interactive Alert -->
+                <div class="big-alert-card" id="stockAlertCard">
+                    <div class="alert-icon-large">⚠️</div>
+                    <h3 style="font-weight:800; font-size:1.2rem; color:#1e293b; margin-bottom:8px;">Stock Bajo</h3>
+                    <p style="font-size:0.9rem; color:#64748b; margin-bottom:16px;">Quedan solo 2 unidades de <b>Taladro
+                            Percutor</b></p>
+                    <button class="restock-btn" id="restockBtn">Reponer Ahora</button>
+                </div>
+
+                <div class="click-finger">👆</div>
+            </div>
+
+            <div class="impact-text impact-text-5">
+                <h1 class="scene5-title">
+                    TE AVISA SI <br>
+                    <span class="red-glow">FALTA STOCK</span>
+                </h1>
+            </div>
+
+            <div class="nav-indicator">
+                <div class="nav-dot"></div>
+                <div class="nav-dot"></div>
+                <div class="nav-dot"></div>
+                <div class="nav-dot"></div>
+                <div class="nav-dot active"></div>
+            </div>
+            <div class="nav-hint">Click o ← → para navegar</div>
+        </div>
+
+    </div>
+
+    <!-- Script update for Scene 5 interaction -->
+    <script>
+        // Existing script... we will append or rely on css mainly, 
+        // but let's add the simple interaction logic here for preservation
+        document.addEventListener('animationstart', (e) => {
+            if (e.animationName === 'fingerTap') {
+                setTimeout(() => {
+                    const btn = document.getElementById('restockBtn');
+                    const card = document.getElementById('stockAlertCard');
+                    if (btn && card) {
+                        btn.innerText = '¡Repuesto!';
+                        btn.style.backgroundColor = '#22c55e';
+                        card.classList.add('restocked');
+                        card.querySelector('.alert-icon-large').innerText = '✅';
+                    }
+                }, 750); // Sync with tap impact
+            }
+        });
+    </script>
+    const scenes = document.querySelectorAll('.scene');
+    let currentScene = 0;
+
+    function updateScene(newIndex) {
+    if (newIndex < 0 || newIndex>= scenes.length) return;
+
+        scenes[currentScene].classList.remove('active');
+        scenes[currentScene].classList.add('prev');
+
+        currentScene = newIndex;
+        scenes.forEach((scene, idx) => {
+        if (idx === currentScene) {
+        scene.classList.add('active');
+        scene.classList.remove('prev');
+        } else if (idx < currentScene) { scene.classList.add('prev'); } });
+            document.querySelectorAll('.nav-dot').forEach((dot, idx)=> {
+            if (idx % scenes.length === currentScene) {
+            dot.classList.add('active');
+            } else {
+            dot.classList.remove('active');
+            }
+            });
+            }
+
+            function nextScene() {
+            if (currentScene < scenes.length - 1) { updateScene(currentScene + 1); } } function prevScene() { if
+                (currentScene> 0) {
+                updateScene(currentScene - 1);
+                }
+                }
+
+                document.getElementById('reel-container').addEventListener('click', () => {
+                if (currentScene < scenes.length - 1) { nextScene(); } else { updateScene(0); } });
+                    document.addEventListener('keydown', (e)=> {
+                    if (e.key === 'ArrowRight') {
+                    nextScene();
+                    } else if (e.key === 'ArrowLeft') {
+                    prevScene();
+                    }
+                    });
+
+                    scenes.forEach((scene) => {
+                    scene.addEventListener('transitionend', () => {
+                    if (scene.classList.contains('active')) {
+                    scene.style.animation = 'none';
+                    setTimeout(() => {
+                    scene.style.animation = '';
+                    }, 10);
+                    }
+                    });
+                    });
+                    </script>
+</body>
+
+</html>
