@@ -1,0 +1,520 @@
+/* SCENE 5: COMPREHENSIVE FEATURES (Carousel) */
+
+#scene5 {
+    background: linear-gradient(135deg, #FFF0F5 0%, #F3E5F5 100%);
+    /* Soft mix of Red/Purple lightly */
+}
+
+/* CAROUSEL CONTAINER */
+.feature-carousel-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.feature-slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateX(50px);
+    transition: all 0.5s ease-in-out;
+    pointer-events: none;
+}
+
+.feature-slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+/* SLIDE 1: ALERT (Redesigned Layout) */
+.slide-alert .big-alert-card {
+    /* Layout */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 20px !important;
+
+    /* Dimensions & Appearance */
+    width: 85%;
+    padding: 40px 30px;
+    background: #ffffff !important;
+    /* Force solid white for visibility check */
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2) !important;
+    border-radius: 24px !important;
+
+    /* Visibility Synced with Text */
+    opacity: 0 !important;
+    transform: scale(0.8) !important;
+    z-index: 50;
+    text-align: center;
+
+    /* Sync Transition - Delayed to appear AFTER title */
+    transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    transition-delay: 1.2s !important;
+}
+
+/* Ensure children are visible */
+.slide-alert .icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background: #fee2e2;
+    /* Light Red BG */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.slide-alert .alert-svg {
+    width: 40px;
+    height: 40px;
+    stroke: #ef4444;
+    /* Red Icon */
+}
+
+.slide-alert .card-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+}
+
+.slide-alert .card-text {
+    font-size: 1rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.slide-alert .card-text .highlight {
+    color: #ef4444;
+    font-weight: 700;
+}
+
+.slide-alert .restock-btn-premium {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    padding: 14px 30px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+/* Pulse Animation activates AFTER entry */
+.feature-slide.active .big-alert-card {
+    opacity: 1 !important;
+    transform: scale(0.9) !important;
+    /* Gentle pulse defined in keyframes below, effectively runs on top of transform?
+       Actually, conflict warning: transform transition vs animation.
+       Best to rely on transition for entry, then maybe an inner element for pulse,
+       OR just stick to static for safety as requested "salir a la vez".
+       Let's stick to transition entry first. */
+}
+
+@keyframes gentlePulse {
+
+    0%,
+    100% {
+        transform: scale(0.9);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+
+    50% {
+        transform: scale(0.92);
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+    }
+}
+
+/* SLIDE 2: SCANNER BARCODE */
+.slide-scanner .scanner-view {
+    width: 80%;
+    height: 250px;
+    background: #ffffff;
+    /* White bg for barcode contrast */
+    border-radius: 20px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: 4px solid #334155;
+    margin-bottom: 20px;
+}
+
+.barcode-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    z-index: 10;
+}
+
+.barcode-bars {
+    width: 180px;
+    height: 80px;
+    background:
+        repeating-linear-gradient(to right,
+            #000 0px,
+            #000 4px,
+            transparent 4px,
+            transparent 7px,
+            #000 7px,
+            #000 10px,
+            transparent 10px,
+            transparent 14px,
+            #000 14px,
+            #000 18px);
+}
+
+.barcode-number {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 1.2rem;
+    letter-spacing: 4px;
+    color: #000;
+}
+
+.scanner-laser {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: #ef4444;
+    /* Red Laser */
+    box-shadow: 0 0 15px #ef4444, 0 0 30px #ef4444;
+    top: 10%;
+    z-index: 20;
+    animation: laserScan 1.5s infinite linear;
+}
+
+@keyframes laserScan {
+    0% {
+        top: 10%;
+        opacity: 0.5;
+    }
+
+    50% {
+        top: 90%;
+        opacity: 1;
+    }
+
+    100% {
+        top: 10%;
+        opacity: 0.5;
+    }
+}
+
+.scan-overlay {
+    position: absolute;
+    bottom: 80px;
+    /* Moved up from 20px to avoid cutoff */
+    background: rgba(16, 185, 129, 0.9);
+    /* Green Match */
+    padding: 10px 20px;
+    border-radius: 12px;
+    color: white;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.feature-slide.active .scan-overlay {
+    animation: scanMatch 0.5s forwards 1s;
+    /* Show after 1s of scanning */
+}
+
+@keyframes scanMatch {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.scan-text {
+    font-weight: 800;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+}
+
+.scan-data {
+    font-size: 0.9rem;
+}
+
+
+/* SLIDE 3: SYNC / MULTI-PLATFORM */
+.slide-sync .devices-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.device-icon {
+    font-size: 4rem;
+    filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.1));
+}
+
+.sync-arrows {
+    font-size: 3rem;
+    color: #3b82f6;
+    /* Blue Sync */
+    font-weight: 900;
+    animation: spinSync 2s infinite linear;
+}
+
+@keyframes spinSync {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.sync-tags {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sync-tag {
+    background: #fff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    color: #0f172a;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    opacity: 0;
+    transform: translateX(-20px);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sync-tag::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: #22c55e;
+    border-radius: 50%;
+}
+
+.feature-slide.active .tag-edit {
+    animation: slideInTag 0.4s forwards 0.5s;
+}
+
+.feature-slide.active .tag-add {
+    animation: slideInTag 0.4s forwards 1.0s;
+}
+
+@keyframes slideInTag {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+/* Common Text for Scene 5 - MOVED TO TOP TO AVOID OVERLAP */
+#scene5 .impact-text,
+.impact-text-5 {
+    top: 15% !important;
+    bottom: auto !important;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    padding: 10px 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    opacity: 0;
+    width: 90%;
+    /* Ensure it fits */
+    max-width: 300px;
+    margin: 0 auto;
+    left: 50%;
+    transform: translateX(-50%);
+    position: absolute;
+    z-index: 60;
+    /* Above card but shouldn't overlap visually now */
+}
+
+/* Make the text container visible IMMEDIATELY when scene is active */
+.scene.active #scene5 .impact-text,
+.scene.active .impact-text-5 {
+    animation: textBoxFadeIn 0.6s ease-out forwards 0.2s;
+}
+
+@keyframes textBoxFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Scene 5 Title Styles */
+.scene5-title {
+    font-weight: 900;
+    font-size: 1.6rem;
+    /* Slightly smaller to fit logic */
+    line-height: 1.1;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+    color: #0f172a;
+}
+
+.scene.active .scene5-title {
+    animation: titleZoom 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 0.3s;
+}
+
+.feature-list-text {
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 500;
+}
+
+/* Interaction Finger Animation */
+#scene5 .click-finger {
+    font-size: 3rem;
+    position: absolute;
+    bottom: 25%;
+    right: 20%;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.scene.active #scene5 .click-finger {
+    animation: fingerTap 1.5s ease-in-out forwards 1.5s;
+}
+
+@keyframes fingerTap {
+    0% {
+        opacity: 0;
+        transform: translate(20px, 20px) scale(0.8);
+    }
+
+    20% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+    }
+
+    40% {
+        transform: scale(0.9);
+    }
+
+    /* Tap down */
+    60% {
+        transform: scale(1);
+    }
+
+    /* Tap up */
+    100% {
+        opacity: 0;
+        transform: translate(-20px, -20px) scale(0.8);
+    }
+}
+
+/* Closing fingerTap */
+
+/* GLOW EFFECTS */
+.red-glow {
+    color: #ef4444;
+    text-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+    animation: redPulse 2s ease-in-out infinite;
+}
+
+.blue-glow {
+    color: #3b82f6;
+    text-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
+    animation: bluePulse 2s ease-in-out infinite;
+}
+
+.green-glow {
+    color: #22c55e;
+    text-shadow: 0 0 30px rgba(34, 197, 94, 0.4);
+    animation: greenPulse 2s ease-in-out infinite;
+}
+
+@keyframes redPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+}
+
+@keyframes bluePulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+}
+
+@keyframes greenPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+}
+
+/* RESTORED TITLE STYLES */
+.scene5-title {
+    font-weight: 900;
+    font-size: 1.6rem;
+    line-height: 1.1;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+    color: #0f172a;
+}
+
+.scene.active .scene5-title {
+    animation: titleZoom 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 0.3s;
+}
+
+@keyframes titleZoom {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}

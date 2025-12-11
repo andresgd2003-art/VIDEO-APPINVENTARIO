@@ -1,0 +1,13 @@
+# Backups
+backups/
+
+# VS Code
+.vscode/
+
+# Other HTML examples
+EJEMPLO DE REEL.HTML
+escena1_el_pasado.html
+reel_inventario_backup.html
+
+# Documentation (opcional, puedes incluirlo si quieres)
+# PLAN DE REEL.md

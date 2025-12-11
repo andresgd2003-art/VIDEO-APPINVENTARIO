@@ -1,0 +1,223 @@
+/* ESTILOS BASE Y GENÉRICOS */
+
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #000;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.video-container {
+    width: 100%;
+    max-width: 420px;
+    aspect-ratio: 9 / 16;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 80px rgba(20, 184, 166, 0.3);
+    border: 1px solid #1a1a1a;
+    background-color: #000000;
+    cursor: pointer;
+}
+
+/* Sistema de escenas */
+.scene {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    pointer-events: none;
+}
+
+.scene.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+.scene.prev {
+    transform: translateX(-100%);
+}
+
+/* Vignette genérico */
+.vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.7) 100%);
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Brand mark */
+.brand-mark {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 50;
+}
+
+.brand-dot {
+    width: 10px;
+    height: 10px;
+    background: #14b8a6;
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(20, 184, 166, 0.8);
+}
+
+.brand-text {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Texto de impacto genérico */
+.impact-text {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 30;
+    width: 90%;
+    max-width: 380px;
+}
+
+.main-title {
+    font-weight: 900;
+    font-size: 2.6rem;
+    line-height: 1.05;
+    text-transform: uppercase;
+    letter-spacing: -1.5px;
+    margin-bottom: 16px;
+    opacity: 0;
+    text-shadow: 0 5px 25px rgba(0, 0, 0, 0.8);
+}
+
+.scene.active .main-title {
+    animation: titleBurst 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 1.2s;
+}
+
+.subtitle {
+    font-size: 0.95rem;
+    color: #a1a1aa;
+    font-weight: 500;
+    line-height: 1.6;
+    opacity: 0;
+}
+
+.scene.active .subtitle {
+    animation: subtitleSlide 1s ease-out forwards 2.2s;
+}
+
+.emphasis {
+    color: #14b8a6;
+    font-weight: 700;
+}
+
+/* Animaciones genéricas */
+@keyframes gridDrift {
+    from {
+        transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-100px);
+    }
+
+    to {
+        transform: perspective(500px) rotateX(60deg) translateY(100px) translateZ(-100px);
+    }
+}
+
+@keyframes titleBurst {
+    from {
+        opacity: 0;
+        transform: scale(0.85) translateY(30px);
+        filter: blur(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: blur(0);
+    }
+}
+
+@keyframes subtitleSlide {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Navegación */
+.nav-indicator {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 50;
+    opacity: 0;
+}
+
+.scene.active .nav-indicator {
+    animation: navFade 0.8s ease-out forwards 0.5s;
+}
+
+@keyframes navFade {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(10px);
+    }
+
+    to {
+        opacity: 0.7;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.nav-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.nav-dot.active {
+    background: #14b8a6;
+    width: 24px;
+    border-radius: 4px;
+    box-shadow: 0 0 15px rgba(20, 184, 166, 0.6);
+}
+
+.nav-hint {
+    position: absolute;
+    bottom: 45px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 600;
+    text-align: center;
+}

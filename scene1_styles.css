@@ -1,0 +1,254 @@
+/* ESCENA 1: PURPLE - El Pasado en Papel */
+
+/* Fondo y grid de la escena 1 */
+#scene1 {
+    background: linear-gradient(135deg, #0a0412 0%, #1a0a28 100%);
+}
+
+.purple-grid {
+    position: absolute;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    background-image:
+        linear-gradient(to right, rgba(168, 85, 247, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(168, 85, 247, 0.08) 1px, transparent 1px);
+    background-size: 35px 35px;
+    transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-100px);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.scene.active .purple-grid {
+    animation: gridDrift 20s linear infinite;
+}
+
+/* Textura de papel de fondo (global) */
+.paper-texture {
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255, 255, 255, 0.015) 2px, rgba(255, 255, 255, 0.015) 4px);
+    opacity: 0.5;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Notebook container y estilos */
+.notebook-container {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 85%;
+    max-width: 340px;
+    perspective: 1500px;
+    z-index: 20;
+}
+
+.scene.active .notebook-container {
+    /* Animación manejada en elementos hijos */
+}
+
+/* PÁGINA DE LIBRETA - ESTILO PAPEL REAL */
+.notebook-page {
+    background: linear-gradient(135deg, #fff8e1 0%, #ffe082 50%, #ffd54f 100%);
+    border-radius: 10px;
+    padding: 28px 22px;
+    box-shadow:
+        0 15px 50px rgba(0, 0, 0, 0.7),
+        inset 0 2px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    transform: rotateX(8deg) rotateY(-3deg);
+    opacity: 0;
+    /* Textura de papel sutil */
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E"), linear-gradient(135deg, #fff8e1 0%, #ffe082 50%, #ffd54f 100%);
+}
+
+.scene.active .notebook-page {
+    animation: notebookEnter 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 1s;
+}
+
+@keyframes notebookEnter {
+    from {
+        opacity: 0;
+        transform: rotateX(35deg) rotateY(-15deg) scale(0.7);
+    }
+
+    to {
+        opacity: 1;
+        transform: rotateX(8deg) rotateY(-3deg) scale(1);
+    }
+}
+
+.notebook-lines {
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(transparent, transparent 27px, rgba(0, 0, 0, 0.1) 27px, rgba(0, 0, 0, 0.1) 28px);
+    border-radius: 10px;
+    pointer-events: none;
+}
+
+.handwritten-list {
+    position: relative;
+    z-index: 10;
+    color: #1a1a1a;
+    /* Black ink */
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    line-height: 1.75;
+    font-weight: 700;
+}
+
+.item-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 9px;
+    opacity: 0;
+    transform: translateX(-30px);
+}
+
+.scene.active .item-line:nth-child(1) {
+    animation: writeIn 0.4s ease-out forwards 1.5s;
+}
+
+.scene.active .item-line:nth-child(2) {
+    animation: writeIn 0.4s ease-out forwards 1.7s;
+}
+
+.scene.active .item-line:nth-child(3) {
+    animation: writeIn 0.4s ease-out forwards 1.9s;
+}
+
+.scene.active .item-line:nth-child(4) {
+    animation: writeIn 0.4s ease-out forwards 2.1s;
+}
+
+.scene.active .item-line:nth-child(5) {
+    animation: writeIn 0.4s ease-out forwards 2.3s;
+}
+
+@keyframes writeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.crossed-out {
+    text-decoration: line-through;
+    text-decoration-color: #dc2626;
+    /* Red 600 */
+    text-decoration-thickness: 3px;
+    opacity: 0.7;
+}
+
+.messy-price {
+    position: relative;
+    color: #dc2626;
+    /* Red 600 */
+    font-weight: 900;
+}
+
+.price-question {
+    color: #b91c1c;
+    /* Red 700 */
+    font-size: 1.05rem;
+    animation: confused 1.8s ease-in-out infinite;
+}
+
+@keyframes confused {
+
+    0%,
+    100% {
+        transform: rotate(-3deg);
+    }
+
+    50% {
+        transform: rotate(3deg);
+    }
+}
+
+.ink-stain {
+    position: absolute;
+    bottom: 18px;
+    left: 25px;
+    width: 35px;
+    height: 35px;
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.4) 0%, transparent 70%);
+    /* Black ink */
+    border-radius: 50%;
+    filter: blur(4px);
+}
+
+.searching-finger {
+    position: absolute;
+    bottom: 28%;
+    right: 12%;
+    font-size: 2.8rem;
+    filter: grayscale(0.2);
+    opacity: 0;
+    z-index: 25;
+    pointer-events: none;
+}
+
+.scene.active .searching-finger {
+    animation: fingerSearch 3.5s ease-in-out infinite 2.6s;
+}
+
+@keyframes fingerSearch {
+
+    0%,
+    100% {
+        opacity: 0;
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    8% {
+        opacity: 1;
+    }
+
+    20% {
+        transform: translate(-35px, -25px) rotate(-8deg);
+    }
+
+    40% {
+        transform: translate(-15px, 15px) rotate(8deg);
+    }
+
+    60% {
+        transform: translate(-45px, -5px) rotate(-5deg);
+    }
+
+    80% {
+        transform: translate(-25px, 20px) rotate(6deg);
+    }
+
+    92% {
+        opacity: 1;
+    }
+}
+
+/* Purple glow effect */
+.purple-glow {
+    color: #a855f7;
+    text-shadow: 0 0 25px rgba(168, 85, 247, 0.9), 0 0 50px rgba(168, 85, 247, 0.5);
+    animation: glowPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+
+    0%,
+    100% {
+        text-shadow: 0 0 25px rgba(168, 85, 247, 0.9), 0 0 50px rgba(168, 85, 247, 0.5);
+    }
+
+    50% {
+        text-shadow: 0 0 35px rgba(168, 85, 247, 1), 0 0 70px rgba(168, 85, 247, 0.7);
+    }
+}

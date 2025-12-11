@@ -1,0 +1,195 @@
+/* SCENE 6: CLOUD BACKUP (FINAL CLEAN VERSION) */
+
+/* Inherits .scene styles for transitions, but we enforce content visibility */
+#scene6 {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    /* Clean Sky Blue */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* Ensure it behaves like other scenes */
+    position: absolute;
+    inset: 0;
+}
+
+/* CONTENT CONTAINER */
+.scene6-center-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    z-index: 10;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.8s ease-out;
+}
+
+.scene.active .scene6-center-content {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.2s;
+    /* Wait for scene slide-in */
+}
+
+/* CLOUD SYSTEM */
+.cloud-system {
+    position: relative;
+    width: 160px;
+    height: 120px;
+}
+
+.cloud-svg-main {
+    width: 100%;
+    height: 100%;
+    stroke: #2563eb;
+    /* Strong Blue */
+    stroke-width: 2;
+    fill: rgba(255, 255, 255, 0.9);
+    filter: drop-shadow(0 12px 24px rgba(37, 99, 235, 0.25));
+    animation: floatClean 3.5s ease-in-out infinite;
+}
+
+@keyframes floatClean {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+.safety-check {
+    position: absolute;
+    top: 0;
+    right: -10px;
+    width: 44px;
+    height: 44px;
+    background: #16a34a;
+    /* Success Green */
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1.4rem;
+    border: 4px solid white;
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    opacity: 0;
+    transform: scale(0) rotate(-20deg);
+}
+
+.scene.active .safety-check {
+    animation: checkPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards 1.0s;
+}
+
+@keyframes checkPop {
+    to {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+/* PARTICLES */
+.upload-dot {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #3b82f6;
+    border-radius: 50%;
+    left: 50%;
+    bottom: -20px;
+    opacity: 0;
+}
+
+.scene.active .upload-dot.d1 {
+    animation: particleUp 2s infinite 0.5s;
+}
+
+.scene.active .upload-dot.d2 {
+    animation: particleUp 2s infinite 1.0s;
+    left: 45%;
+}
+
+.scene.active .upload-dot.d3 {
+    animation: particleUp 2s infinite 1.5s;
+    left: 55%;
+}
+
+@keyframes particleUp {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-80px) scale(0);
+        opacity: 0;
+    }
+}
+
+/* SECURITY BADGE */
+.security-badge {
+    background: white;
+    padding: 12px 24px;
+    border-radius: 99px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 8px 20px rgba(30, 64, 175, 0.1);
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.scene.active .security-badge {
+    animation: badgeSlideUp 0.8s ease-out forwards 1.4s;
+}
+
+.lock-icon {
+    font-size: 1.5rem;
+}
+
+.security-badge span:last-child {
+    font-weight: 800;
+    color: #f59e0b;
+    letter-spacing: 0.5px;
+    font-size: 1.1rem;
+}
+
+@keyframes badgeSlideUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* TITLE */
+.cloud-title {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #1e3a8a;
+    /* Dark Blue */
+    text-align: center;
+    line-height: 1;
+    opacity: 0;
+    transform: scale(0.95);
+}
+
+.scene.active .cloud-title {
+    animation: titleFadeIn 0.8s ease-out forwards 0.4s;
+}
+
+@keyframes titleFadeIn {
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
