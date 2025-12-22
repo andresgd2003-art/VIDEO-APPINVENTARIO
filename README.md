@@ -1,6 +1,6 @@
-# Sting AI - Video App Inventario
+# Sting AI - Video App Inventario + POS
 
-Reel promocional animado para la aplicación de inventario **Sting AI**.
+Reel promocional animado para **Sting AI** - La solución completa de Inventario + POS que funciona 100% desde tu celular.
 
 ## 🎬 Demo en Vivo
 
@@ -8,15 +8,17 @@ Reel promocional animado para la aplicación de inventario **Sting AI**.
 
 ## 📝 Descripción
 
-Reel vertical (9:16) diseñado para redes sociales que muestra las características principales de Sting AI:
+Reel vertical (9:16) diseñado para redes sociales que muestra el diferenciador clave de Sting AI: **Todo desde tu celular**
 
-- **Escena 1**: El problema del inventario en papel
-- **Escena 2**: La complejidad de Excel
-- **Escena 3**: La transformación digital
-- **Escena 4**: Interfaz visual moderna
-- **Escena 5**: Funciones inteligentes (alertas, scanner, multi-plataforma)
+### Mensaje Principal: Movilidad, Portabilidad, Rapidez y Economía
+
+- **Escena 1**: El problema del papel (atado a una libreta)
+- **Escena 2**: El problema de Excel (atrapado en la computadora)
+- **Escena 3**: La liberación (¡Todo en tu celular!)
+- **Escena 4**: Interfaz móvil (Todo desde tu celular)
+- **Escena 5**: Funciones móviles (tu cámara es tu escáner, tu celular es tu caja, reportes en tu mano)
 - **Escena 6**: Respaldo en la nube
-- **Escena 7**: Llamado a la acción (CTA)
+- **Escena 7**: Llamado a la acción - "Tu negocio completo, en tu celular"
 
 ## 🚀 Tecnologías
 

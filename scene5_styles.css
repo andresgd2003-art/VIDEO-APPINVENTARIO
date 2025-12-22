@@ -1,8 +1,48 @@
 /* SCENE 5: COMPREHENSIVE FEATURES (Carousel) */
 
 #scene5 {
-    background: linear-gradient(135deg, #FFF0F5 0%, #F3E5F5 100%);
-    /* Soft mix of Red/Purple lightly */
+    background: linear-gradient(135deg, #ec4899 0%, #f43f5e 50%, #fb923c 100%);
+    /* Vibrant Pink -> Rose -> Orange gradient */
+    position: relative;
+}
+
+/* Ensure Scene 5 has proper layout */
+#scene5 {
+    background: linear-gradient(135deg, #b91c1c 0%, #ef4444 50%, #ea580c 100%);
+    /* Strong Red -> Red -> Dark Orange */
+    position: absolute;
+    /* Must be absolute to obey inset: 0 from .scene */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Animated grid overlay for depth */
+#scene5::before {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 30px 30px;
+    transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-100px);
+    z-index: 1;
+    pointer-events: none;
+    animation: gridDrift 20s linear infinite;
+}
+
+@keyframes gridDrift {
+    from {
+        transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-100px);
+    }
+
+    to {
+        transform: perspective(500px) rotateX(60deg) translateY(30px) translateZ(-100px);
+    }
 }
 
 /* CAROUSEL CONTAINER */
@@ -14,6 +54,8 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    z-index: 10;
+    /* Above grid overlay */
 }
 
 .feature-slide {
@@ -338,21 +380,20 @@
 .impact-text-5 {
     top: 15% !important;
     bottom: auto !important;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
-    padding: 10px 20px;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 14px 24px;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     opacity: 0;
     width: 90%;
-    /* Ensure it fits */
-    max-width: 300px;
+    max-width: 320px;
     margin: 0 auto;
     left: 50%;
     transform: translateX(-50%);
     position: absolute;
     z-index: 60;
-    /* Above card but shouldn't overlap visually now */
 }
 
 /* Make the text container visible IMMEDIATELY when scene is active */
@@ -516,5 +557,225 @@
     100% {
         opacity: 1;
         transform: scale(1) translateY(0);
+    }
+}
+
+/* NEW BADGE STYLES (for all slides) */
+.scanner-badge,
+.pos-badge,
+.reports-badge {
+    position: absolute;
+    bottom: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 8px 16px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: badgeFadeIn 0.5s forwards 1.5s;
+}
+
+@keyframes badgeFadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+.badge-icon {
+    font-size: 1.2rem;
+}
+
+.badge-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* SLIDE 2: POS / CASH REGISTER */
+.slide-pos .pos-interface {
+    width: 85%;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.pos-cart-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 12px;
+}
+
+.item-emoji {
+    font-size: 1.8rem;
+}
+
+.item-name {
+    flex: 1;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.item-price {
+    font-weight: 700;
+    color: #3b82f6;
+    font-size: 1.1rem;
+}
+
+.pos-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+.total-label {
+    font-weight: 800;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.total-amount {
+    font-weight: 900;
+    color: white;
+    font-size: 1.8rem;
+}
+
+.pos-btn-sell {
+    width: 100%;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.pos-btn-sell:hover {
+    transform: scale(1.05);
+}
+
+/* SLIDE 3: REPORTS / ANALYTICS */
+.slide-reports .reports-dashboard {
+    width: 85%;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.report-chart {
+    margin-bottom: 20px;
+}
+
+.chart-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    height: 120px;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.chart-bar {
+    flex: 1;
+    background: linear-gradient(180deg, #8b5cf6 0%, #6366f1 100%);
+    border-radius: 8px 8px 0 0;
+    min-height: 20px;
+    animation: barGrow 0.8s ease-out forwards;
+    transform-origin: bottom;
+}
+
+@keyframes barGrow {
+    from {
+        transform: scaleY(0);
+    }
+
+    to {
+        transform: scaleY(1);
+    }
+}
+
+.report-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.report-card {
+    background: #f8fafc;
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.card-label {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.card-value {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #1e293b;
+}
+
+.download-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.download-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Purple glow for reports slide */
+.purple-glow {
+    color: #8b5cf6;
+    text-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
+    animation: purplePulse 2s ease-in-out infinite;
+}
+
+@keyframes purplePulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.8;
     }
 }
