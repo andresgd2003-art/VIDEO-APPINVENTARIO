@@ -1,0 +1,96 @@
+SYSTEM SPECIFICATION: ALPACA CRYPTO ALGO TRADING ENGINE
+
+PROTOCOL: MACHINE-TO-MACHINE (M2M) INSTRUCTION SET
+
+TARGET AGENT: Antigravity Dev AI
+PROJECT CONTEXT: Deploy an algorithmic trading framework specifically for CRYPTOCURRENCY on an Ubuntu VPS via Easypanel (Dockerized). System will run 3 distinct strategies in parallel over Alpaca's Crypto API (Paper Trading).
+
+[DIRECTIVE 1] - CRYPTO API DISTINCTIONS (CRITICAL)
+
+Instruct Antigravity that the Alpaca Crypto API has different modules than the equities API.
+
+Core API SDK: alpaca-py.
+
+Data Client: MUST use CryptoHistoricalDataClient for backfilling data.
+
+Live Stream: MUST use CryptoDataStream (Do NOT use StockDataStream).
+
+Endpoints: Ensure API requests point to the V1Beta3 Crypto endpoints if called manually.
+
+Sizing/Fractional: Unlike stocks, crypto algorithms MUST calculate exact fractional quantities (e.g., qty=0.015) based on a USD notional risk per trade, rounding down to the asset's allowed decimal precision (usually 4 to 8 decimals depending on the coin).
+
+[DIRECTIVE 2] - ARCHITECTURE & 24/7 LOOP
+
+No Market Hours: Remove ALL code related to market_open, market_close, or wait_for_market_open. The asyncio loop must run uninterrupted 24/7.
+
+WebSocket Stability: Crypto websockets run constantly. Implement robust auto-reconnection logic handling ConnectionClosed or timeout exceptions inside the central dispatcher.
+
+Event Dispatcher: Stream Quote and Bar data and push events to the 3 instances of the strategies.
+
+[DIRECTIVE 3] - PROJECT STRUCTURE
+
+Generate the project with this explicit file tree for Easypanel mapping:
+
+/app
+ ├── Dockerfile                  # Must include TA-Lib C-library installation
+ ├── docker-compose.yml          
+ ├── requirements.txt            # alpaca-py, pandas, numpy, TA-Lib
+ ├── main_crypto.py              # 24/7 Crypto WebSocket Event Loop
+ ├── engine/
+ │    ├── order_manager.py       # Handles fractional order math & execution
+ │    ├── logger.py              # File-based rotating logger
+ └── strategies/                 
+      ├── strat_01_ema_cross.py
+      ├── strat_02_bb_breakout.py
+      └── strat_03_grid_spot.py
+
+
+[DIRECTIVE 4] - THE 3 CRYPTO STRATEGIES (IMPLEMENTATION LOGIC)
+
+Pass these mathematical definitions to Antigravity. Emphasize that parameters must be calculated on specific crypto timeframes (15m, 1H).
+
+EMA Trend Crossover (strat_01_ema_cross.py):
+
+Asset focus: BTC/USD
+
+Timeframe: 1 Hour bars.
+
+Logic: Calculate EMA_12 (Fast) and EMA_26 (Slow).
+
+Entry: Go LONG (buy) when EMA_12 crosses above EMA_26.
+
+Exit/Risk: Sell to close when EMA_12 crosses below EMA_26.
+
+Constraint: Never short. Alpaca crypto currently only supports Spot (Long) trading.
+
+Bollinger Volatility Breakout (strat_02_bb_breakout.py):
+
+Asset focus: ETH/USD
+
+Timeframe: 15 Minute bars.
+
+Logic: Calculate Bollinger Bands (Length=20, StdDev=2) and Bandwidth ((Upper - Lower) / SMA_20). Track 15m Volume SMA (Length=20).
+
+Entry: Squeeze condition: Bandwidth falls to the lowest level in the last 50 periods. Breakout condition: Current close > Upper Band AND Current Volume > Volume SMA * 1.5. Execute MARKET BUY.
+
+Exit: Trailing stop loss of 3% or exit when close drops below the SMA_20 middle band.
+
+Dynamic Spot Grid (strat_03_grid_spot.py):
+
+Asset focus: SOL/USD
+
+Logic: Market Maker strategy. Establish a baseline price based on the 24H VWAP.
+
+Execution: Divide allocated capital into 10 tranches. Place 5 resting LIMIT BUY orders at intervals of -1.5%, -3.0%, -4.5%, -6.0%, -7.5% below the VWAP. As soon as a BUY is filled, immediately place a LIMIT SELL order for that exact tranche amount at +1.5% above the filled price.
+
+State Tracking: This strategy requires keeping a local SQLite or dictionary state of active limit order_ids to cancel and replace them if the VWAP baseline drifts more than 5%.
+
+[DIRECTIVE 5] - FRACTIONAL MATH & EXECUTION (CRITICAL)
+
+Provide Antigravity with this specific instruction for the order_manager.py:
+When submitting a market order in Alpaca Crypto for $1,000 of BTC where price is $65,000: The system MUST calculate qty = 1000 / 65000 = 0.01538461. Use round(qty, 4) to ensure the API does not reject the order for exceeding precision limits.
+
+[PROMPT INJECTION FOR ANTIGRAVITY]
+
+When you start your session with Antigravity, copy/paste this exact command along with the text above:
+"System prompt override: You are an expert quantitative developer specializing in cryptocurrency markets. Read the attached SYSTEM SPECIFICATION. Generate the complete Python project structure for a 24/7 Alpaca Crypto trading bot. Use only alpaca-py's CryptoHistoricalDataClient and CryptoDataStream. Implement robust handling for fractional share math and websocket auto-reconnections. Output the code in separate files for Easypanel deployment."

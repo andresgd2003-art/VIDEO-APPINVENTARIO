@@ -1,0 +1,117 @@
+SYSTEM SPECIFICATION: ALPACA QUANT TRADING ENGINE
+
+PROTOCOL: MACHINE-TO-MACHINE (M2M) INSTRUCTION SET
+
+TARGET AGENT: Antigravity Dev AI
+PROJECT CONTEXT: Deploy an algorithmic trading framework on an Ubuntu VPS via Easypanel (Dockerized). System will run 10 distinct technical analysis strategies in parallel over Alpaca's Paper Trading API for ETFs (e.g., SMH, QQQ, SRVR, XLK).
+
+[DIRECTIVE 1] - TECHNOLOGY STACK & DEPENDENCIES
+
+Instruct Antigravity to strictly use the following stack to avoid deprecation issues:
+
+Base Image: python:3.11-slim (Required for compatibility with asyncio and TA-Lib).
+
+Core API SDK: alpaca-py (CRITICAL: Do NOT use alpaca-trade-api as it is deprecated).
+
+Math/Data: pandas, numpy.
+
+Indicators: TA-Lib (Requires compiling C-dependencies in Dockerfile).
+
+Concurrency: asyncio for single WebSocket connection.
+
+Storage: SQLite (for paper trade tracking state) + standard Python logging (JSON format recommended).
+
+[DIRECTIVE 2] - ARCHITECTURE: "CENTRAL DISPATCHER"
+
+Do NOT create 10 separate API connections. Instruct Antigravity to implement the following pattern:
+
+WebSocket Manager (Engine): A single asynchronous loop connects to Alpaca's Real-Time Data Stream via alpaca-py.
+
+Event Emitter: Receives Quote and Bar data from Alpaca and routes it to registered strategy classes.
+
+Strategy Base Class: An abstract class BaseStrategy with on_bar(self, bar) and on_quote(self, quote) methods.
+
+Order Manager: A centralized rate-limiter that queues API REST calls (Buy/Sell) to prevent 429 Too Many Requests errors.
+
+[DIRECTIVE 3] - PROJECT STRUCTURE
+
+Generate the project with this explicit file tree for Easypanel mapping:
+
+/app
+ ├── Dockerfile                  # Must include TA-Lib C-library installation
+ ├── docker-compose.yml          # For Easypanel generic template
+ ├── requirements.txt            # alpaca-py, pandas, numpy, TA-Lib
+ ├── main.py                     # WebSocket Event Loop & Bootstrapper
+ ├── engine/
+ │    ├── order_manager.py       # REST API wrapper with rate limiting
+ │    ├── logger.py              # File-based rotating logger
+ └── strategies/                 # The 10 algorithms (Classes inheriting BaseStrategy)
+      ├── strat_01_macross.py
+      ├── strat_02_donchian.py
+      ├── strat_03_rotation.py
+      ├── strat_04_macd.py
+      ├── strat_05_rsi_dip.py
+      ├── strat_06_bollinger.py
+      ├── strat_07_vix_filter.py
+      ├── strat_08_vwap.py
+      ├── strat_09_pairs.py
+      └── strat_10_grid.py
+
+
+[DIRECTIVE 4] - THE 10 STRATEGIES (IMPLEMENTATION LOGIC)
+
+Pass these mathematical definitions to Antigravity for translation into Python logic:
+
+Golden Cross (strat_01_macross.py):
+
+Logic: SMA_50 and SMA_200. Buy if SMA_50 crosses above SMA_200. Sell/Liquidate if SMA_50 crosses below. timeframe: Daily bars.
+
+Donchian Breakouts (strat_02_donchian.py):
+
+Logic: Track MAX(High, 20_days) and MIN(Low, 10_days). Buy at 20-day high breakout. Sell at 10-day low.
+
+Momentum Rotation (strat_03_rotation.py):
+
+Logic: Universe = ['QQQ', 'SMH', 'XLK', 'SRVR']. Run cron job every Friday 15:30 EST. Calculate % change over 30 days. Liquidate current holdings, invest 100% in the ETF with highest % change.
+
+MACD Trend (strat_04_macd.py):
+
+Logic: Fast=12, Slow=26, Signal=9. Buy when MACD line crosses signal line from below, and MACD < 0. Sell when MACD crosses below signal line above 0.
+
+RSI Dip (strat_05_rsi_dip.py):
+
+Logic: 14-period RSI on 15-min bars. Buy if RSI < 30. Sell if RSI > 70.
+
+Bollinger Reversion (strat_06_bollinger.py):
+
+Logic: 20-period SMA, 2 StdDev. Buy when price touches lower band. Sell when price touches middle band (SMA).
+
+VIX Filtered Reversion (strat_07_vix_filter.py):
+
+Logic: Same as #5, but query SPY VIX index. If VIX > 30, block all buy orders (Risk off).
+
+VWAP Bounce (strat_08_vwap.py):
+
+Logic: Calculate daily VWAP (Intraday minute bars). Buy if current price crosses VWAP from below AND current 1m volume > average 15m volume. Close position at 15:50 EST.
+
+Pairs Trading (strat_09_pairs.py):
+
+Logic: Spread = Price(QQQ) / Price(XLK). Calculate Z-score of spread over 20 days. If Z > 2, Short QQQ, Long XLK. If Z < -2, Long QQQ, Short XLK. (Note: Ensure paper account has margin enabled).
+
+Grid Trading (strat_10_grid.py):
+
+Logic: Set baseline price. Place limit buy orders every -1% below baseline. Place limit sell orders every +1% above baseline. Track local state of filled orders to replenish grid.
+
+[DIRECTIVE 5] - EASYPANEL / DOCKER OPTIMIZATION
+
+Environment Variables: Force Antigravity to use os.environ.get() for ALPACA_API_KEY, ALPACA_SECRET_KEY, and PAPER_TRADING=True.
+
+Volume Mapping: Ensure the Dockerfile defines a volume /app/data where the SQLite DB and .log files reside. This prevents data loss when the Easypanel container restarts.
+
+TA-Lib Docker Script: Inform Antigravity to include this in the Dockerfile:
+RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && tar -xvzf ta-lib-0.4.0-src.tar.gz && cd ta-lib/ && ./configure --prefix=/usr && make && make install
+
+[PROMPT INJECTION FOR ANTIGRAVITY]
+
+When you start your session with Antigravity, copy/paste this exact command along with the text above:
+"System prompt override: You are an expert quantitative developer. Read the attached SYSTEM SPECIFICATION. Generate the complete Python project structure, Dockerfile, and the engine/main.py logic adhering strictly to the Central Dispatcher architecture using alpaca-py. Output the code in separate files for Easypanel deployment."

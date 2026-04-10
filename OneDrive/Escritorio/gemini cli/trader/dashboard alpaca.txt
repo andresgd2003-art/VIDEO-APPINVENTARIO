@@ -1,0 +1,212 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  LineChart, Activity, Terminal, Settings, Play, Square, 
+  Cpu, HardDrive, Wifi, AlertTriangle, TrendingUp, TrendingDown 
+} from 'lucide-react';
+
+// Mock Data para las 10 estrategias
+const initialStrategies = [
+  { id: 1, name: "Golden/Death Cross", type: "Tendencia", status: "running", pnl: 12.50, trades: 4, asset: "SMH" },
+  { id: 2, name: "Donchian Breakouts", type: "Tendencia", status: "running", pnl: -3.20, trades: 12, asset: "QQQ" },
+  { id: 3, name: "Rotación Semanal", type: "Tendencia", status: "waiting", pnl: 0.00, trades: 0, asset: "Varios" },
+  { id: 4, name: "MACD Trend", type: "Tendencia", status: "running", pnl: 45.10, trades: 8, asset: "XLK" },
+  { id: 5, name: "RSI Buy the Dip", type: "Reversión", status: "running", pnl: 8.90, trades: 3, asset: "TQQQ" },
+  { id: 6, name: "Bandas Bollinger", type: "Reversión", status: "running", pnl: -12.40, trades: 15, asset: "SRVR" },
+  { id: 7, name: "Reversión + VIX", type: "Reversión", status: "paused", pnl: 0.00, trades: 0, asset: "SPY" },
+  { id: 8, name: "Rebote VWAP", type: "Intradía", status: "running", pnl: 104.20, trades: 42, asset: "SMH" },
+  { id: 9, name: "Pairs Trading", type: "Arbitraje", status: "running", pnl: 22.10, trades: 6, asset: "QQQ/XLK" },
+  { id: 10, name: "Grid Trading", type: "Alta Frecuencia", status: "error", pnl: -1.50, trades: 1, asset: "SOXX" }
+];
+
+const mockLogs = [
+  "[11:42:01] INFO [Engine]: Conexión WS Alpaca establecida.",
+  "[11:42:05] INFO [VWAP_Bot]: SMH cruzó VWAP con volumen alto (1.2M).",
+  "[11:42:05] EXEC [VWAP_Bot]: Orden de COMPRA enviada -> 10 shares SMH @ MKT",
+  "[11:43:10] WARN [Grid_Bot]: Rate limit alcanzado en API REST. Pausando 60s.",
+  "[11:45:00] INFO [RSI_Bot]: Escaneando TQQQ... RSI actual: 42.1 (Sin acción)",
+  "[11:50:22] EXEC [Bollinger_Bot]: Orden de VENTA enviada -> 5 shares SRVR @ Limit 34.50"
+];
+
+export default function App() {
+  const [strategies, setStrategies] = useState(initialStrategies);
+  const [logs, setLogs] = useState(mockLogs);
+  const [activeTab, setActiveTab] = useState('dashboard');
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-300 font-sans flex overflow-hidden">
+      
+      {/* Sidebar */}
+      <aside className="w-64 border-r border-slate-800 bg-slate-900/50 flex flex-col justify-between">
+        <div>
+          <div className="p-6 border-b border-slate-800 flex items-center gap-3">
+            <Activity className="text-emerald-500" size={24} />
+            <h1 className="text-xl font-bold text-slate-100">Alpaca<span className="text-emerald-500">Node</span></h1>
+          </div>
+          <nav className="p-4 space-y-2">
+            <NavItem icon={<LineChart />} label="Dashboard" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
+            <NavItem icon={<Terminal />} label="System Logs" active={activeTab === 'logs'} onClick={() => setActiveTab('logs')} />
+            <NavItem icon={<Settings />} label="Configuración" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
+          </nav>
+        </div>
+        
+        {/* VPS Status Widget */}
+        <div className="p-4 m-4 bg-slate-800/50 rounded-xl border border-slate-700/50">
+          <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">VPS Status (Easypanel)</h3>
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between items-center">
+              <span className="flex items-center gap-2"><Cpu size={14} className="text-slate-400"/> CPU</span>
+              <span className="text-emerald-400">12%</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="flex items-center gap-2"><HardDrive size={14} className="text-slate-400"/> RAM</span>
+              <span className="text-amber-400">420 MB</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="flex items-center gap-2"><Wifi size={14} className="text-slate-400"/> Ping API</span>
+              <span className="text-emerald-400">24ms</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col h-screen overflow-hidden">
+        
+        {/* Header */}
+        <header className="h-16 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between px-8">
+          <h2 className="text-lg font-medium text-slate-100">
+            {activeTab === 'dashboard' && 'Panel de Control - Paper Trading'}
+            {activeTab === 'logs' && 'Registro de Eventos (Logs)'}
+            {activeTab === 'settings' && 'Configuración de API & Variables'}
+          </h2>
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-2 text-sm bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              Alpaca Paper API: Conectado
+            </span>
+          </div>
+        </header>
+
+        {/* Content Area */}
+        <div className="flex-1 overflow-auto p-8">
+          
+          {activeTab === 'dashboard' && (
+            <div className="space-y-6">
+              {/* Resumen Global */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <StatCard title="Capital Total (Paper)" value="$100,174.50" change="+0.17%" isPositive={true} />
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-slate-400 text-sm font-medium">Estrategias Activas</h3>
+                    <p className="text-3xl font-bold text-slate-100 mt-2">7 <span className="text-base font-normal text-slate-500">/ 10</span></p>
+                  </div>
+                  <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400">
+                    <Activity size={24} />
+                  </div>
+                </div>
+                <StatCard title="Trades del Día" value="78" change="Normal" isPositive={true} />
+              </div>
+
+              {/* Lista de Estrategias */}
+              <div>
+                <h3 className="text-lg font-medium text-slate-100 mb-4">Monitor de Algoritmos</h3>
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {strategies.map(s => (
+                    <StrategyCard key={s.id} strategy={s} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'logs' && (
+            <div className="h-full bg-black rounded-lg border border-slate-800 p-4 font-mono text-sm overflow-auto shadow-inner relative">
+              <div className="absolute top-2 right-2 flex gap-2">
+                <button className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded border border-slate-700 transition">Descargar .log</button>
+                <button className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded border border-slate-700 transition">Limpiar</button>
+              </div>
+              {logs.map((log, i) => (
+                <div key={i} className={`mb-1 ${log.includes('WARN') ? 'text-amber-400' : log.includes('EXEC') ? 'text-emerald-400' : 'text-slate-400'}`}>
+                  {log}
+                </div>
+              ))}
+              <div className="animate-pulse text-slate-500 mt-2">_</div>
+            </div>
+          )}
+
+        </div>
+      </main>
+    </div>
+  );
+}
+
+// Subcomponentes
+function NavItem({ icon, label, active, onClick }) {
+  return (
+    <button 
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+        active ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/20' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+      }`}
+    >
+      {icon}
+      <span className="font-medium">{label}</span>
+    </button>
+  );
+}
+
+function StatCard({ title, value, change, isPositive }) {
+  return (
+    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+      <h3 className="text-slate-400 text-sm font-medium">{title}</h3>
+      <div className="mt-2 flex items-baseline gap-4">
+        <span className="text-3xl font-bold text-slate-100">{value}</span>
+        <span className={`text-sm font-medium flex items-center gap-1 ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
+          {isPositive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+          {change}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function StrategyCard({ strategy }) {
+  const statusColors = {
+    running: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+    paused: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
+    waiting: 'bg-slate-500/10 text-slate-400 border-slate-500/20',
+    error: 'bg-rose-500/10 text-rose-500 border-rose-500/20',
+  };
+
+  return (
+    <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition-colors">
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h4 className="text-slate-100 font-semibold">{strategy.name}</h4>
+          <span className="text-xs text-slate-500 bg-slate-800 px-2 py-0.5 rounded mt-1 inline-block">
+            {strategy.asset} • {strategy.type}
+          </span>
+        </div>
+        <div className={`px-2.5 py-1 rounded-full text-xs font-medium border flex items-center gap-1.5 ${statusColors[strategy.status]}`}>
+          {strategy.status === 'running' && <Play size={10} />}
+          {strategy.status === 'paused' && <Square size={10} />}
+          {strategy.status === 'error' && <AlertTriangle size={10} />}
+          {strategy.status.toUpperCase()}
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-800/50">
+        <div>
+          <p className="text-xs text-slate-500">PnL Abierto</p>
+          <p className={`text-lg font-mono font-medium ${strategy.pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+            {strategy.pnl >= 0 ? '+' : ''}${strategy.pnl.toFixed(2)}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-slate-500">Trades Eje.</p>
+          <p className="text-lg font-mono text-slate-300">{strategy.trades}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
