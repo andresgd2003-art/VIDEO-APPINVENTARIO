@@ -1,0 +1,286 @@
+{
+  "version": "2.0",
+  "fecha_auditoria": "2026-05-14",
+  "fecha_revalidacion": "2026-05-14",
+  "estado_validacion": "VALIDADO_CONTRA_PDF_OFICIAL_DIPUTADOS_2025",
+  "marco_legal": {
+    "LGTAIP": {
+      "nombre_completo": "Ley General de Transparencia y Acceso a la Informacion Publica",
+      "ultima_reforma_dof": "Nueva Ley DOF 20-03-2025 (abroga la LGTAIP DOF 04-05-2015 y sus reformas)",
+      "fuente_oficial": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LGTAIP.pdf",
+      "nota_cambio_numeracion": "En la LGTAIP 2025, el articulo sobre informacion confidencial es el 115 (en la ley abrogada 2015 era el 116). El Art. 116 vigente trata sobre fideicomisos.",
+      "articulos_relevantes": {
+        "115": "Se considera informacion confidencial la que contiene datos personales concernientes a una persona fisica identificada o identificable. La informacion confidencial no estara sujeta a temporalidad alguna y solo podran tener acceso a ella los titulares de la misma, sus representantes y las personas servidoras publicas facultadas para ello. Se considera como informacion confidencial de personas fisicas o morales: los secretos bancario, fiduciario, industrial, comercial, fiscal, bursatil y postal, cuya titularidad corresponda a las personas particulares, sujetos de derecho internacional o a sujetos obligados cuando no involucren el ejercicio de recursos publicos. Asimismo, sera informacion confidencial aquella que presenten las personas particulares a los sujetos obligados, siempre que tengan el derecho a ello, de conformidad con lo dispuesto por las leyes o los tratados internacionales. Se considera confidencial el pronunciamiento sobre la existencia o inexistencia de quejas, denuncias y/o procedimientos administrativos seguidos en contra de personas servidoras publicas y particulares que se encuentren en tramite o no hayan concluido con una sancion firme."
+      }
+    },
+    "LGPDPPSO": {
+      "nombre_completo": "Ley General de Proteccion de Datos Personales en Posesion de Sujetos Obligados",
+      "ultima_reforma_dof": "Nueva Ley DOF 20-03-2025, ultima reforma DOF 14-11-2025. Abroga la LGPDPPSO DOF 26-01-2017.",
+      "fuente_oficial": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LGPDPPSO.pdf",
+      "nota_cambio_numeracion": "En la LGPDPPSO 2025: la fraccion de Disociacion migro de 3-XI (ley 2017) a 3-XIII (ley 2025). El consentimiento expreso y por escrito para datos sensibles paso del Art. 21 (ley 2017) al Art. 15 ultimo parrafo (ley 2025). Las excepciones que antes remitian al Art. 22 ahora remiten al Art. 16.",
+      "articulos_relevantes": {
+        "3-IX": "Datos personales: Cualquier informacion concerniente a una persona identificada o identificable. Se considera que una persona es identificable cuando su identidad pueda determinarse directa o indirectamente a traves de cualquier informacion.",
+        "3-X": "Datos personales sensibles: Aquellos que se refieran a la esfera mas intima de su titular, o cuya utilizacion indebida pueda dar origen a discriminacion o conlleve un riesgo grave para esta. De manera enunciativa mas no limitativa, se consideran sensibles los datos personales que puedan revelar aspectos como origen racial o etnico, estado de salud presente o futuro, informacion genetica, creencias religiosas, filosoficas y morales, opiniones politicas y preferencia sexual.",
+        "3-XIII": "Disociacion: Procedimiento mediante el cual los datos personales no pueden asociarse a la persona titular ni permitir, por su estructura, contenido o grado de desagregacion, la identificacion de la misma.",
+        "7": "Por regla general no podran tratarse datos personales sensibles, salvo que se cuente con el consentimiento expreso de la persona titular o, en su defecto, se trate de los casos establecidos en el articulo 16 de esta Ley. En el tratamiento de datos personales de menores de edad se debera privilegiar el interes superior de la nina, el nino y el adolescente, en terminos de las disposiciones juridicas aplicables.",
+        "15-ultimo-parrafo": "Tratandose de datos personales sensibles, el responsable debera obtener el consentimiento expreso y por escrito de la persona titular para su tratamiento, a traves de su firma autografa, firma electronica o cualquier mecanismo de autenticacion que al efecto se establezca, salvo en los casos previstos en el articulo 16 de esta Ley."
+      }
+    }
+  },
+  "diccionario_datos_sensibles": {
+    "DATO_CURP": {
+      "descripcion": "Clave Unica de Registro de Poblacion (RENAPO, 18 caracteres alfanumericos)",
+      "categoria": "personal",
+      "fundamento": [
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "3-IX"
+        },
+        {
+          "ley": "LGTAIP",
+          "articulo": "115"
+        }
+      ],
+      "regex_referencia": "\\b[A-Z][AEIOUX][A-Z]{2}\\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\\d|3[01])[HM](?:AS|B[CS]|C[CLMSH]|D[FG]|G[TR]|HG|JC|M[CNS]|N[ETL]|OC|PL|Q[TR]|S[PLR]|T[CSL]|VZ|YN|ZS|NE)[B-DF-HJ-NP-TV-Z]{3}[A-Z\\d]\\d\\b"
+    },
+    "DATO_RFC_PF": {
+      "descripcion": "Registro Federal de Contribuyentes persona fisica (13 caracteres con homoclave)",
+      "categoria": "personal",
+      "fundamento": [
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "3-IX"
+        },
+        {
+          "ley": "LGTAIP",
+          "articulo": "115"
+        }
+      ],
+      "regex_referencia": "\\b[A-ZÑ&]{4}\\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\\d|3[01])[A-Z\\d]{2}[A\\d]\\b"
+    },
+    "DATO_RFC_PM": {
+      "descripcion": "Registro Federal de Contribuyentes persona moral (12 caracteres)",
+      "categoria": "personal",
+      "fundamento": [
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "3-IX"
+        },
+        {
+          "ley": "LGTAIP",
+          "articulo": "115"
+        }
+      ],
+      "regex_referencia": "\\b[A-ZÑ&]{3}\\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\\d|3[01])[A-Z\\d]{2}[A\\d]\\b"
+    },
+    "PERSON_NAME": {
+      "descripcion": "Nombre completo de persona fisica (nombres y apellidos)",
+      "categoria": "personal",
+      "fundamento": [
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "3-IX"
+        },
+        {
+          "ley": "LGTAIP",
+          "articulo": "115"
+        }
+      ],
+      "regex_referencia": "NER spaCy es_core_news_md (regex insuficiente)"
+    },
+    "DATO_DOMICILIO": {
+      "descripcion": "Domicilio particular (calle, numero, colonia, CP, municipio, estado)",
+      "categoria": "personal",
+      "fundamento": [
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "3-IX"
+        },
+        {
+          "ley": "LGTAIP",
+          "articulo": "115"
+        }
+      ],
+      "regex_referencia": "NER + regex CP (?<!\\d)\\d{5}(?!\\d)"
+    },
+    "DATO_TELEFONO": {
+      "descripcion": "Numero telefonico fijo o movil (10 digitos MX)",
+      "categoria": "personal",
+      "fundamento": [
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "3-IX"
+        },
+        {
+          "ley": "LGTAIP",
+          "articulo": "115"
+        }
+      ],
+      "regex_referencia": "(?:\\+?52[\\s\\-]?(?:1[\\s\\-]?)?)?(?:\\(?\\d{2,3}\\)?[\\s\\-]?)?\\d{3,4}[\\s\\-]?\\d{4}\\b"
+    },
+    "DATO_EMAIL": {
+      "descripcion": "Direccion de correo electronico personal",
+      "categoria": "personal",
+      "fundamento": [
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "3-IX"
+        },
+        {
+          "ley": "LGTAIP",
+          "articulo": "115"
+        }
+      ],
+      "regex_referencia": "\\b[A-Za-z0-9._%+\\-]+@[A-Za-z0-9.\\-]+\\.[A-Za-z]{2,}\\b"
+    },
+    "DATO_CP": {
+      "descripcion": "Codigo Postal Sepomex (5 digitos)",
+      "categoria": "personal",
+      "fundamento": [
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "3-IX"
+        }
+      ],
+      "regex_referencia": "(?<!\\d)\\d{5}(?!\\d)"
+    },
+    "DATO_CLABE": {
+      "descripcion": "Clave Bancaria Estandarizada SPEI (18 digitos) - validar modulo 10 ponderado [3,7,1]",
+      "categoria": "personal",
+      "fundamento": [
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "3-IX"
+        },
+        {
+          "ley": "LGTAIP",
+          "articulo": "115 (secreto bancario)"
+        }
+      ],
+      "regex_referencia": "\\b\\d{18}\\b"
+    },
+    "DATO_INE": {
+      "descripcion": "Clave de elector INE (18 caracteres alfanumericos)",
+      "categoria": "personal",
+      "fundamento": [
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "3-IX"
+        },
+        {
+          "ley": "LGTAIP",
+          "articulo": "115"
+        }
+      ],
+      "regex_referencia": "\\b[A-Z]{6}\\d{8}[HM]\\d{3}\\b"
+    },
+    "DATO_PASAPORTE": {
+      "descripcion": "Numero de pasaporte mexicano (alfanumerico 8-9 caracteres)",
+      "categoria": "personal",
+      "fundamento": [
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "3-IX"
+        },
+        {
+          "ley": "LGTAIP",
+          "articulo": "115"
+        }
+      ],
+      "regex_referencia": "\\b[A-Z]?\\d{8,9}\\b"
+    },
+    "DATO_NSS": {
+      "descripcion": "Numero de Seguridad Social IMSS (11 digitos) - validar Luhn",
+      "categoria": "personal",
+      "fundamento": [
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "3-IX"
+        },
+        {
+          "ley": "LGTAIP",
+          "articulo": "115"
+        }
+      ],
+      "regex_referencia": "\\b\\d{11}\\b"
+    },
+    "DATO_SALUD": {
+      "descripcion": "Estado de salud, diagnosticos, tratamientos, expediente clinico",
+      "categoria": "sensible",
+      "fundamento": [
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "3-X"
+        },
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "15 (ultimo parrafo)"
+        }
+      ],
+      "regex_referencia": "NER + diccionario medico (CIE-10)"
+    },
+    "DATO_BIOMETRICO": {
+      "descripcion": "Huella dactilar, iris, reconocimiento facial, voz, ADN",
+      "categoria": "sensible",
+      "fundamento": [
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "3-X"
+        },
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "15 (ultimo parrafo)"
+        }
+      ],
+      "regex_referencia": "Deteccion por contexto y metadatos de imagen"
+    },
+    "DATO_ORIGEN_ETNICO": {
+      "descripcion": "Origen racial o etnico del titular",
+      "categoria": "sensible",
+      "fundamento": [
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "3-X"
+        }
+      ],
+      "regex_referencia": "NER + diccionario lexico"
+    },
+    "DATO_RELIGION": {
+      "descripcion": "Creencias religiosas, filosoficas o morales",
+      "categoria": "sensible",
+      "fundamento": [
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "3-X"
+        }
+      ],
+      "regex_referencia": "NER + diccionario lexico"
+    },
+    "DATO_PREFERENCIA_SEXUAL": {
+      "descripcion": "Preferencia u orientacion sexual del titular",
+      "categoria": "sensible",
+      "fundamento": [
+        {
+          "ley": "LGPDPPSO",
+          "articulo": "3-X"
+        }
+      ],
+      "regex_referencia": "NER + diccionario lexico"
+    }
+  },
+  "orden_deteccion_recomendado": [
+    "DATO_CURP",
+    "DATO_RFC_PF",
+    "DATO_RFC_PM",
+    "DATO_INE",
+    "DATO_CLABE",
+    "DATO_NSS",
+    "DATO_PASAPORTE",
+    "DATO_TELEFONO",
+    "DATO_CP",
+    "DATO_EMAIL",
+    "PERSON_NAME",
+    "DATO_DOMICILIO"
+  ],
+  "notas": "Citas literales VALIDADAS contra PDF oficial diputados.gob.mx (descarga 2026-05-14, extraccion con pdfplumber). LGTAIP vigente: DOF 20-03-2025. LGPDPPSO vigente: DOF 20-03-2025 con ultima reforma 14-11-2025. Cambios estructurales vs leyes abrogadas (2015/2017): (1) LGTAIP: info confidencial migro Art. 116 → 115; el Art. 116 actual trata fideicomisos. (2) LGPDPPSO: Disociacion paso de fraccion XI → XIII. (3) LGPDPPSO: consentimiento expreso sensibles migro de Art. 21 → Art. 15 ultimo parrafo; excepciones del Art. 22 → Art. 16. (4) Lenguaje renovado con perspectiva de genero. CURP/RFC/INE/NSS/CLABE/pasaporte no se nombran en la ley pero quedan protegidos por la definicion amplia del Art. 3-IX LGPDPPSO y Art. 115 LGTAIP. La disociacion (Art. 3-XIII LGPDPPSO) es el fundamento juridico del sanitizador. Los regex permisivos (CLABE, NSS) requieren validador checksum post-deteccion. Contexto: nuevas leyes expedidas tras reforma constitucional de simplificacion organica (dic-2024) que extinguio al INAI."
+}

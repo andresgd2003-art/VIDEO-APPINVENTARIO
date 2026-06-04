@@ -1,0 +1,109 @@
+Prompt para el Asistente de IA (Copiar y Pegar)
+
+Instrucción para la IA:
+
+Actúa como un experto en diseño de interfaces de usuario (UI/UX) y desarrollador avanzado de Python utilizando Tkinter y CustomTkinter.
+
+Necesito que refactorices y actualices el aspecto visual de mi archivo TestData_IA_Local/src/ui_validator.py. El objetivo es implementar un sistema de diseño llamado "Institucional Moderno", diseñado para maximizar la legibilidad, transmitir seguridad forense y dar una apariencia gubernamental de vanguardia.
+
+Aplica estrictamente las siguientes reglas de color, proporciones y estilo a todos los componentes de CustomTkinter:
+
+1. CONFIGURACIÓN GLOBAL Y VENTANA
+
+Resolución base: La ventana principal debe ser de 1280x800 píxeles.
+
+Modo de apariencia: Forzar el modo claro (customtkinter.set_appearance_mode("Light")), pero aplicaremos colores específicos a los frames.
+
+Tipografía base: Utilizar una fuente Sans-Serif limpia (como "Segoe UI", "Helvetica", o "Roboto").
+
+Títulos: Tamaño 16 o 18, en negrita ("bold").
+
+Texto general y botones: Tamaño 13 o 14, normal.
+
+Texto secundario/pequeño: Tamaño 11 o 12.
+
+Bordes y Formas: Todo debe tener esquinas suavemente redondeadas. Utilizar corner_radius=8 o 10 en todos los frames, botones y entradas de texto.
+
+2. PALETA DE COLORES (Aplicar vía fg_color, text_color, etc.)
+
+Debes mapear estos colores hexadecimales exactamente a las propiedades de CustomTkinter:
+
+Fondo principal de la aplicación (App Background): #F8FAFC (Slate 50).
+
+Panel Derecho (Controles) y Tarjetas: #FFFFFF (Blanco puro).
+
+Encabezado superior (Header): #0F172A (Slate 900) con texto #FFFFFF.
+
+Fondo del Visor PDF (Lienzo/Canvas): #E2E8F0 (Slate 200).
+
+Texto Principal: #1E293B (Slate 800).
+
+Texto Secundario (Etiquetas pequeñas, estados): #64748B (Slate 500).
+
+Bordes separadores (border_color): #E2E8F0 o #CBD5E1.
+
+3. ESTILOS DE BOTONES
+
+Crea clases o funciones auxiliares (o aplica directamente los estilos) para 3 tipos de botones:
+
+Botón Primario (Ej. Analizar Documento):
+
+fg_color="#0369A1" (Sky 700)
+
+hover_color="#0284C7" (Sky 600)
+
+text_color="#FFFFFF"
+
+corner_radius=8
+
+Botón Secundario (Ej. Cargar PDF, Marcado Manual, Guardar):
+
+fg_color="#FFFFFF"
+
+hover_color="#F1F5F9" (Slate 100)
+
+text_color="#334155" (Slate 700)
+
+border_width=1
+
+border_color="#CBD5E1"
+
+corner_radius=8
+
+Botón de Peligro / Acción Destructiva (Redactar todo el documento):
+
+fg_color="#B91C1C" (Red 700)
+
+hover_color="#991B1B" (Red 800)
+
+text_color="#FFFFFF"
+
+corner_radius=8
+
+4. DISPOSICIÓN Y PROPORCIONES (Layout)
+
+Encabezado: Un CTkFrame superior con altura fija (ej. 50px), fondo #0F172A, abarcando todo el ancho (fill="x"). El texto debe decir "ANONIMA — Validador de Datos Personales" en color blanco.
+
+Panel Izquierdo (Visor PDF): Debe ocupar todo el espacio restante (pack(side="left", fill="both", expand=True) o su equivalente en grid). Su fondo debe ser el gris azulado #E2E8F0. El widget Canvas de Tkinter dentro de él debe tener un borde nulo (bd=0, highlightthickness=0).
+
+Panel Derecho (Controles): Debe tener un ancho fijo de exactamente 400 píxeles (width=400). Fondo #FFFFFF.
+
+Padding: Usa paddings consistentes. Por ejemplo, padx=20, pady=20 para los márgenes internos del panel derecho, y un espaciado vertical de pady=15 entre cada sección (Archivo, Análisis, Marcado, etc.).
+
+5. CAJAS DE ENTRADA Y TEXTO (Inputs / Textboxes)
+
+Para la "Lista de Descarte" (CTkTextbox o CTkEntry):
+
+fg_color="#F8FAFC"
+
+border_width=1
+
+border_color="#CBD5E1"
+
+text_color="#1E293B"
+
+corner_radius=8
+
+TAREA:
+
+Con base en estas especificaciones, por favor genera el código Python actualizado utilizando customtkinter. Asegúrate de reestructurar la creación de los widgets de la interfaz actual para que se apeguen exactamente a esta paleta de colores, márgenes y tipografías. Mantén intacta la lógica de backend (carga de modelo, hilos, etc.), solo altera la presentación visual.

@@ -1,0 +1,192 @@
+================================================================================
+ ANONIMA — VALIDADOR DE DATOS PERSONALES EN PDF
+ Descripción de la Interfaz de Usuario (UI) y su funcionamiento
+================================================================================
+Archivo de la UI: TestData_IA_Local/src/ui_validator.py
+Tecnología: Python + Tkinter / CustomTkinter (ventana de escritorio)
+Propósito: revisar un PDF, detectar datos personales (PII) y generar una
+           "versión pública" redactada (tapada) conforme a LGTAIP / LGPDPPSO.
+
+
+================================================================================
+1. VISIÓN GENERAL
+================================================================================
+La aplicación abre una ventana de escritorio (1280x800) dividida en dos zonas:
+
+  +---------------------------------------------+----------------------+
+  |                                             |  PANEL DE CONTROL    |
+  |        VISOR DEL PDF (lienzo/canvas)        |  (columna derecha)   |
+  |        - imagen de la página                |  - Archivo           |
+  |        - recuadros de colores sobre los     |  - Análisis          |
+  |          datos detectados                   |  - Marcado manual    |
+  |                                             |  - Lista de descarte |
+  |        [ barra de zoom 🔍- 100% 🔍+ ]       |  - Redacción         |
+  |                                             |  - Leyenda de colores|
+  +---------------------------------------------+----------------------+
+
+El flujo típico es: Cargar PDF → Analizar → revisar/ajustar → Redactar.
+
+
+================================================================================
+2. COMPONENTES DE LA INTERFAZ
+================================================================================
+
+2.1 PANEL IZQUIERDO — VISOR DEL PDF
+-----------------------------------
+- Lienzo (canvas) que muestra la página renderizada como imagen.
+- Sobre la imagen se dibujan RECUADROS de colores que marcan cada dato
+  personal detectado (el color indica el tipo de dato; ver leyenda).
+- Barras de desplazamiento vertical y horizontal.
+- Barra de ZOOM (esquina inferior izquierda): botones 🔍- y 🔍+ y un
+  porcentaje. También se puede hacer zoom con Ctrl + rueda del ratón.
+- Interacciones con el ratón:
+    * Clic sobre un recuadro  -> activa/desactiva ese dato (si se desactiva,
+      se pinta gris y NO se tapará al redactar).
+    * Arrastrar (en modo manual) -> dibuja un recuadro nuevo a mano.
+    * Rueda del ratón -> desplaza la página; Ctrl+rueda -> zoom.
+
+2.2 PANEL DERECHO — CONTROLES (de arriba hacia abajo)
+-----------------------------------------------------
+Encabezado: "ANONIMA — Validador de Datos Personales".
+
+a) Sección ARCHIVO
+   - Etiqueta con el nombre del archivo cargado ("Sin archivo cargado" al inicio).
+   - Botón "Cargar PDF": abre el explorador para elegir un .pdf.
+   - Navegación de páginas:  ‹  "Página X de Y"  ›
+   - Al cargar, la app clasifica el documento y muestra su tipo:
+       "Documento nativo"      (texto digital, rápido)
+       "Documento escaneado"   (imagen -> usa OCR, más lento)
+       "Documento híbrido"     (mezcla de páginas nativas y escaneadas)
+
+b) Sección ANÁLISIS
+   - Botón "Analizar todas las páginas": ejecuta la detección de PII en todo
+     el documento.
+   - Barra de progreso (aparece durante el análisis).
+   - Etiqueta de estado: muestra el progreso ("Cargando modelo NLP…",
+     "Pág. 2/3: escaneada — OCR…", "15 entidades totales · 8 en esta página",
+     etc.).
+
+c) Sección MARCADO MANUAL
+   - Botón "Activar marcado manual": permite dibujar recuadros sobre datos que
+     la IA no detectó (arrastrando el ratón sobre el PDF).
+   - Selector "Tipo de dato a marcar" (solo visible en modo manual): CURP, RFC,
+     Nombre/Persona, Domicilio, Teléfono, Correo, etc. (define el color/tipo).
+   - Botón "↩ Deshacer último marcado".
+   - Clic sobre un recuadro lo activa/desactiva.
+
+d) Sección LISTA DE DESCARTE
+   - Caja de texto (una palabra/nombre por línea) con términos que NO deben
+     censurarse aunque la IA los detecte (p. ej. nombres de instituciones).
+   - Se aplica en tiempo real: los datos cuyo texto coincide se ignoran.
+
+e) Sección REDACCIÓN
+   - Botón "Redactar todo el documento": aplica la censura definitiva e
+     irreversible y guarda un archivo nuevo "<nombre>_redactado.pdf".
+   - Botón "Guardar sin redactar": guarda una copia del PDF tal cual.
+
+f) Sección LEYENDA DE COLORES
+   - Lista de colores y a qué tipo de dato corresponde cada uno:
+       Rojo oscuro  -> CURP / RFC / INE / idCIF
+       Naranja      -> Persona / Nombre
+       Rojo         -> Menor de edad
+       Morado       -> CLABE / Tarjeta / NSS / Marcado manual
+       Morado osc.  -> Monto patrimonial
+       Azul oscuro  -> Placa / VIN
+       Azul         -> Teléfono / Email / Código Postal
+       Verde        -> Ubicación
+       Naranja osc. -> Fecha de nacimiento / Edad
+       Verde azul.  -> Diagnóstico médico
+
+
+================================================================================
+3. FUNCIONAMIENTO PASO A PASO (uso normal)
+================================================================================
+1) Al abrir la app, en segundo plano se carga el modelo de IA (NLP). Mientras
+   tanto el estado muestra "Cargando modelo NLP…". La ventana NO se congela
+   porque la carga corre en un hilo aparte.
+
+2) "Cargar PDF": se elige el archivo. La app lo abre, detecta si es nativo o
+   escaneado y muestra la primera página en el visor.
+
+3) "Analizar todas las páginas": recorre el documento y detecta los datos
+   personales. En páginas escaneadas usa OCR (reconocimiento de texto en
+   imágenes), por lo que tarda más (la barra de progreso lo indica). Al
+   terminar, dibuja los recuadros de colores sobre cada dato.
+
+4) REVISIÓN del usuario:
+   - Clic en un recuadro para descartar un dato que NO quiere tapar.
+   - "Marcado manual" para tapar algo que la IA omitió.
+   - "Lista de descarte" para evitar que ciertos términos se censuren.
+   - Cambiar de página con ‹ › y revisar todo.
+
+5) "Redactar todo el documento": genera el PDF redactado final.
+
+6) (Opcional) "Guardar sin redactar" para conservar una copia original.
+
+
+================================================================================
+4. CÓMO FUNCIONA POR DENTRO (resumen técnico)
+================================================================================
+
+4.1 Carga del modelo (no bloquea la UI)
+   - Al iniciar, un hilo (thread) llama a detector.build_analyzer() que carga
+     el motor de detección (spaCy + GLiNER + reglas de Presidio).
+   - La UI se comunica con ese hilo mediante una "cola" (queue) que se revisa
+     periódicamente con self.after(...), así la ventana sigue respondiendo.
+
+4.2 Lectura del PDF (módulo pdf_reader.py)
+   - Clasifica cada página: NATIVA (tiene texto digital) o ESCANEADA (imagen).
+   - Página nativa: extrae las palabras y sus posiciones con PyMuPDF.
+   - Página escaneada: rasteriza la imagen y aplica OCR con PaddleOCR
+     (modelos "mobile" PP-OCRv5, elegidos por velocidad: ~20-35 s/página en
+     lugar de ~8 min con el modelo "server"). Las palabras OCR se reensamblan
+     (los acentos partidos por el OCR se vuelven a unir) y sus recuadros se
+     expanden "hasta el punto medio" del hueco con la palabra vecina, para
+     tapar bien la palabra sin invadir a las de al lado.
+
+4.3 Detección de datos personales (módulo detector.py)
+   - Combina tres enfoques:
+       * Expresiones regulares para identificadores con formato fijo
+         (CURP, RFC, CLABE, NSS, placa, VIN, tarjeta, CP, teléfono, email,
+         monto, fecha, edad, idCIF, y campos de domicilio/nombre de la CSF).
+       * Validadores oficiales de checksum (CURP, RFC, CLABE, tarjeta): un
+         identificador que no pasa el dígito verificador se descarta (evita
+         tapar folios que por coincidencia parecen CURP/RFC).
+       * IA de lenguaje (spaCy + GLiNER) para nombres de personas, jueces,
+         secretarios, menores y diagnósticos.
+   - Filtros antifalsos-positivos: descarta servidores públicos (jueces,
+     fiscales), teléfonos públicos institucionales (SAT), correos .gob.mx,
+     fechas administrativas que no son de nacimiento, etiquetas de campo, etc.
+   - En campos estructurados (CSF) recorta la etiqueta para tapar SOLO el valor
+     (p. ej. "Nombre de Vialidad: AMANECER" -> se redacta solo "AMANECER").
+   - Resuelve solapamientos por prioridad (gana el dato más específico).
+
+4.4 Mapeo a coordenadas (módulo mapper.py)
+   - Convierte cada dato detectado (rango de texto) en uno o varios recuadros
+     con coordenadas sobre la página, que son los que se dibujan y se tapan.
+
+4.5 Redacción / sanitización (módulo sanitizer.py)
+   - Es IRREVERSIBLE y forense: rasteriza la página, pinta de negro las áreas
+     a tapar y reemplaza todo el contenido de la página por esa imagen, de
+     modo que el texto original ya no existe ni es recuperable.
+   - Además: limpia metadatos del PDF y vuelve a guardar con "garbage collection"
+     para que los flujos originales no queden ocultos en el archivo.
+   - Inserta un "Acta de Justificación Legal" (report_generator.py) y registra
+     la operación en una bitácora de auditoría (audit.py).
+   - El resultado se guarda como "<nombre>_redactado.pdf".
+
+
+================================================================================
+5. NOTAS Y BUENAS PRÁCTICAS
+================================================================================
+- La primera vez que se usa el OCR en una sesión, se cargan los modelos
+  (~15 s extra una sola vez).
+- A mayor resolución del escaneo, mejor detección (más datos reconocidos).
+- Revise siempre los recuadros antes de redactar: puede descartar datos que no
+  correspondan o agregar manualmente los que la IA haya omitido.
+- La redacción NO se puede deshacer sobre el archivo de salida; el PDF original
+  no se modifica (se crea uno nuevo "_redactado").
+- El Sello Digital (firma criptográfica del SAT) no se redacta por no ser un
+  dato personal; el RFC contenido en la Cadena Original sí se detecta.
+
+================================================================================
