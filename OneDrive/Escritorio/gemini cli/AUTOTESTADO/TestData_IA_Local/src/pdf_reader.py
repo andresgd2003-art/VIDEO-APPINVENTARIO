@@ -245,17 +245,35 @@ def _ocr_jpeg_embebidos(page: pymupdf.Page, doc: pymupdf.Document) -> list[tuple
     page_area = page.rect.width * page.rect.height
     img_info = page.get_image_info()
 
-    # Cobertura máxima de una sola imagen → si >85% es escáner full-page (flujo estándar)
+    # Cobertura de las imágenes embebidas:
+    #  - máxima de una sola imagen
+    #  - suma total
     max_ratio = 0.0
+    total_ratio = 0.0
     for info in img_info:
         bbox = info.get("bbox")
         if bbox:
-            area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
-            max_ratio = max(max_ratio, area / page_area if page_area else 0)
+            ratio = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1]) / page_area if page_area else 0
+            max_ratio = max(max_ratio, ratio)
+            total_ratio += ratio
+
+    # >85% una sola imagen → escáner full-page (flujo estándar de página).
     if max_ratio > 0.85:
         return None
 
-    logger.info("Página con %d imagen(es) embebida(s) (<85%% cobertura) — OCR por imagen individual", len(imgs))
+    # Imágenes diminutas (logos, sellos, decoración) → NO son el contenido del
+    # documento. El contenido real puede ser texto NATIVO o VECTORIAL (curvas/paths,
+    # ej. constancias CENEVAL/certificados). Hacer OCR solo del logo perdería todo
+    # el texto. Caer al flujo de página completa, que rasteriza y OCR-ea TODO.
+    _MIN_RATIO_INDIVIDUAL = 0.12   # la imagen mayor debe cubrir ≥12% para tratarla como contenido
+    _MIN_TOTAL_INDIVIDUAL = 0.15   # o el conjunto de imágenes ≥15% del área
+    if max_ratio < _MIN_RATIO_INDIVIDUAL and total_ratio < _MIN_TOTAL_INDIVIDUAL:
+        return None
+
+    logger.info(
+        "Página con %d imagen(es) embebida(s) (max %.0f%%, total %.0f%%) — OCR por imagen individual",
+        len(imgs), max_ratio * 100, total_ratio * 100,
+    )
 
     ZOOM_EMB = 4.0   # ~288 DPI: credenciales pequeñas necesitan alta resolución
     PADDING = 20

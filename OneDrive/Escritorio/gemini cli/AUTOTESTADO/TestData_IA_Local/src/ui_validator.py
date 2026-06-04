@@ -123,6 +123,7 @@ COLORES_ENTIDAD: dict[str, str] = {
     "MX_FECHA_NAC": "#d35400",
     "MX_EDAD":      "#d35400",
     "MX_NSS":       "#8e44ad",
+    "MX_MATRICULA": "#8e44ad",
     # Domicilio / localización geográfica
     "MX_DOMICILIO":  "#1abc9c",
     "MX_COLONIA":    "#1abc9c",

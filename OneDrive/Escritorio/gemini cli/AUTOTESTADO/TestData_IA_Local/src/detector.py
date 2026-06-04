@@ -436,6 +436,16 @@ def _filtrar_falsos_positivos(resultados: list, texto: str) -> list:
                 limpios.append(r)
             continue
 
+        # ── MX_MATRICULA: recortar ":/espacios" iniciales para tapar solo el valor ──
+        if r.entity_type == "MX_MATRICULA":
+            m_lead = re.match(r"^[\s:]+", texto[r.start:r.end])
+            if m_lead:
+                try:
+                    r.start = r.start + m_lead.end()
+                except Exception:
+                    pass
+                fragmento = texto[r.start:r.end].strip()
+
         # ── Campos estructurados: recortar "Etiqueta:" para tapar solo el valor ──
         if r.entity_type in ("MX_DOMICILIO", "MX_COLONIA", "MX_IDCIF", "MX_ENTIDAD_REGISTRO"):
             m_ev = _RE_ETIQUETA_VALOR.match(texto[r.start:r.end])
@@ -537,6 +547,13 @@ def _filtrar_falsos_positivos(resultados: list, texto: str) -> list:
         # Contexto para nacionalidad: rechaza "MEXICANA" sin indicador de nacionalidad
         if r.entity_type == "MX_NACIONALIDAD":
             if not _tiene_contexto(texto, r.start, r.end, _RE_CTX_NACIONALIDAD, radio=60):
+                continue
+            # Falso positivo: menciones genéricas/condicionales en instrucciones
+            # ("en el caso de sustentantes de nacionalidad extranjera") no son el
+            # dato del titular. Se descartan si hay enunciado genérico antes.
+            previo = texto[max(0, r.start - 45):r.start].lower()
+            if re.search(r'\b(?:caso[s]?\s+de|sustentante[s]?|aspirante[s]?|'
+                         r'persona[s]?\s+de|qui[eé]n(?:es)?|aquellos|los\s+que)\b', previo):
                 continue
 
         # Filtros de contexto para Datos Sensibles (evita falsos positivos como "PAN" o "Católico" sin contexto)
@@ -789,6 +806,19 @@ def _build_analyzer_impl() -> AnalyzerEngine:
                 regex=r"\b\d{10}\b",
                 score=0.5,
             )],
+            supported_language="es",
+        ),
+        PatternRecognizer(
+            supported_entity="MX_MATRICULA",
+            patterns=[
+                # "Matrícula: 2109262" / "Matricula 2109262" — ID escolar/institucional.
+                # Lookbehind fijo (Matr[ií]cula = 9 chars) → captura solo el valor.
+                Pattern(
+                    name="matricula_label",
+                    regex=r"(?i)(?<=Matr[ií]cula)\s*:?\s*[A-Z0-9]{5,12}\b",
+                    score=0.85,
+                ),
+            ],
             supported_language="es",
         ),
         PatternRecognizer(
@@ -1456,7 +1486,7 @@ def analyze_page(analyzer: AnalyzerEngine, text: str) -> list:
         "MX_CLABE", "MX_NSS", "MX_CUENTA", "MX_PLACA", "MX_VIN", "MX_TARJETA", "MX_MONTO",
         "MX_TEL", "MX_CP", "MX_EMAIL", "MX_DOMICILIO", "MX_COLONIA", "MX_ENTIDAD_REGISTRO",
         "MX_FECHA_NAC", "MX_EDAD", "MX_DIAGNOSTICO", "MX_NOMBRE", "MX_IDCIF",
-        "MX_CRIP", "MX_LUGAR_NAC", "MX_NACIONALIDAD", "MX_SEXO",
+        "MX_CRIP", "MX_LUGAR_NAC", "MX_NACIONALIDAD", "MX_SEXO", "MX_MATRICULA",
         "MX_ORIGEN_ETNICO", "MX_RELIGION", "MX_OPINION_POLITICA", "MX_PREFERENCIA_SEXUAL", "MX_BIOMETRICO",
         "PERSON", "Persona", "Juez", "Secretario", "Diagnóstico", "Menor", "LOCATION",
     ]
@@ -1482,6 +1512,7 @@ _PRIORIDAD = {
     "MX_NSS": 8, "MX_PLACA": 8, "MX_FECHA_NAC": 8, "MX_EDAD": 7,
     "MX_MONTO": 7, "MX_CUENTA": 6,
     "MX_DOMICILIO": 8, "MX_COLONIA": 7, "MX_DIAGNOSTICO": 9, "MX_ENTIDAD_REGISTRO": 9,
+    "MX_MATRICULA": 9,
     "MX_TEL": 5, "MX_CP": 4,
     # Datos de acta de nacimiento
     "MX_LUGAR_NAC": 9, "MX_CRIP": 9,
