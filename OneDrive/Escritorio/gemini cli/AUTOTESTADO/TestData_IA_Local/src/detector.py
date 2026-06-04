@@ -107,6 +107,8 @@ _RE_NARRATIVA_PREFIX = re.compile(
     r"identificado\s+como\s+|identificada\s+como\s+|"
     r"llamado\s+|llamada\s+|denominado\s+|denominada\s+|"
     r"a\s+nombre\s+de\s+|expedido\s+a\s+|emitido\s+a\s+|girado\s+a\s+|"
+    # Etiqueta INE: "NOMBRE" (opcionalmente con "SEXO H" intercalado por el layout)
+    r"NOMBRE\s+(?:SEXO\s*[HM]?\s+)?|"
     r"(?:el|la)\s+(?:C\.\s+|ciudadano\s+|ciudadana\s+|se[ñn]or\s+|se[ñn]ora\s+|sr\.\s+|sra\.\s+|lic\.\s+))",
     re.IGNORECASE,
 )
@@ -1361,6 +1363,22 @@ def _build_analyzer_impl() -> AnalyzerEngine:
                     r"\s*:\s+" + _NOMBRE_CAPS
                 ),
                 score=0.90,
+            ),
+
+            # ── Nombre en credencial INE — determinista, NO depende de GLiNER ──
+            # Layout: "NOMBRE [SEXO H] APELLIDO APELLIDO NOMBRES DOMICILIO".
+            # La etiqueta NOMBRE + (opcional SEXO H que el OCR intercala) precede
+            # al nombre en MAYÚSCULAS; se detiene antes de DOMICILIO/CURP/CLAVE.
+            # El prefijo "NOMBRE [SEXO H]" se recorta en _filtrar_falsos_positivos
+            # vía _RE_NARRATIVA_PREFIX.
+            Pattern(
+                name="nombre_credencial_ine",
+                regex=(
+                    r"(?i)NOMBRE\s+(?:SEXO\s*[HM]?\s+)?"
+                    r"(?-i:[A-ZÁÉÍÓÚÑ]{2,}(?:\s+[A-ZÁÉÍÓÚÑ]{2,}){1,3})"
+                    r"(?=\s+(?:DOMICILIO|CLAVE|CURP|FECHA|SECCI|VIGENCIA|$))"
+                ),
+                score=0.88,
             ),
         ],
         supported_language="es",

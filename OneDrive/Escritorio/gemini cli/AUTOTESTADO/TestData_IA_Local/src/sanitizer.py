@@ -3,7 +3,7 @@ import pymupdf
 
 _PADDING_LEFT  = 0.2   # Reducido para no rozar signos o palabras adyacentes
 _PADDING_RIGHT = 0.2   # Reducido para no invadir signos de puntuacion
-_PADDING_Y     = 1.5
+_PADDING_Y     = 1.0   # Ceñido vertical: evita rozar los renglones de arriba/abajo
 
 
 def sanitize_page(page: pymupdf.Page, rects: list[pymupdf.Rect], fill_color=(0, 0, 0)):

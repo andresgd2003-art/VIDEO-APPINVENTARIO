@@ -308,16 +308,30 @@ def _ocr_jpeg_embebidos(page: pymupdf.Page, doc: pymupdf.Document) -> list[tuple
             # El pixmap cubre EXACTAMENTE img_rect escalado por ZOOM_EMB, con origen
             # en (img_rect.x0, img_rect.y0). Solo hay que quitar el padding, dividir
             # por el zoom y sumar el offset del rect. Inmune a rotación/flip.
+            #
+            # EasyOCR devuelve cajas con holgura vertical (CRAFT detecta con margen).
+            # Para credenciales con renglones muy juntos (INE), eso hace que el
+            # tachado roce las líneas de arriba/abajo. Se acota la altura al 78%
+            # centrado y se usa padding vertical mínimo (el horizontal se mantiene).
+            _SHRINK_Y = 0.78        # conservar 78% de la altura, centrado en el glifo
+            _PAD_OCR_Y = 0.0        # sin padding vertical extra en la ruta OCR
             for p in palabras_raw:
                 bx0 = p['bbox'][0] - PADDING
                 by0 = p['bbox'][1] - PADDING
                 bx1 = p['bbox'][2] - PADDING
                 by1 = p['bbox'][3] - PADDING
 
+                # X: mapeo directo + padding horizontal
                 px0 = max(img_rect.x0, img_rect.x0 + bx0 / ZOOM_EMB - _PAD_OCR)
-                py0 = max(img_rect.y0, img_rect.y0 + by0 / ZOOM_EMB - _PAD_OCR)
                 px1 = min(img_rect.x1, img_rect.x0 + bx1 / ZOOM_EMB + _PAD_OCR)
-                py1 = min(img_rect.y1, img_rect.y0 + by1 / ZOOM_EMB + _PAD_OCR)
+
+                # Y: mapear, luego encoger hacia el centro para ceñir al renglón
+                ay0 = img_rect.y0 + by0 / ZOOM_EMB
+                ay1 = img_rect.y0 + by1 / ZOOM_EMB
+                cy = (ay0 + ay1) / 2.0
+                half = (ay1 - ay0) / 2.0 * _SHRINK_Y
+                py0 = max(img_rect.y0, cy - half - _PAD_OCR_Y)
+                py1 = min(img_rect.y1, cy + half + _PAD_OCR_Y)
 
                 if px1 <= px0 or py1 <= py0:
                     continue
