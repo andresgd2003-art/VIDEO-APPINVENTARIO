@@ -78,7 +78,10 @@ _RE_RANGO_ANIO      = re.compile(r'^\d{4}-\d{4}$')
 # Prefijo "LABEL:" al inicio del span — se recorta antes de validar
 # Cubre todas las etiquetas comunes en documentos legales/identidad mexicanos
 _ETIQUETAS_LABEL = (
-    r"IMPUTADO|IMPUTADA|ACUSADO|ACUSADA|SENTENCIADO|SENTENCIADA"
+    r"TITULAR|CONTRIBUYENTE|SOLICITANTE|PACIENTE|INTERESADO|INTERESADA"
+    r"|PROMOVENTE|CAUSANTE|DEUDOR|DEUDORA|ACREEDOR|ACREEDORA"
+    r"|TRABAJADOR|TRABAJADORA|ASEGURADO|ASEGURADA|BENEFICIARIO|BENEFICIARIA"
+    r"|IMPUTADO|IMPUTADA|ACUSADO|ACUSADA|SENTENCIADO|SENTENCIADA"
     r"|V[Ií]CTIMA|OFENDIDO|OFENDIDA|AGRAVIADO|AGRAVIADA"
     r"|TESTIGO|DENUNCIANTE|QUEJOSO|QUEJOSA"
     r"|ACTOR|ACTORA|DEMANDADO|DEMANDADA|TERCERO\s+INTERESADO"
@@ -1187,12 +1190,18 @@ def _build_analyzer_impl() -> AnalyzerEngine:
     # span más largo. Con un tipo distinto, el span limpio del regex sobrevive;
     # los spans contaminados de GLiNER (tipo Persona) mueren en el filtro de
     # etiquetas. En _filtrar_falsos_positivos se recorta el prefijo "Etiqueta:".
+    # Patrón reutilizable: nombre en MAYÚSCULAS (2-4 palabras).
+    # (?!\s*:) evita tragarse la etiqueta del campo siguiente ("CURP:", "RFC:", etc.)
+    _NOMBRE_CAPS = r"(?-i:[A-ZÁÉÍÓÚÑ]{2,}(?:\s+(?![A-ZÁÉÍÓÚÑ]+\s*:)[A-ZÁÉÍÓÚÑ]{2,}){1,3})"
+
     recognizers.append(PatternRecognizer(
         supported_entity="MX_NOMBRE",
         patterns=[
             # (?-i:...) fuerza distinción de mayúsculas pese a que Presidio compila
             # los patrones con IGNORECASE global; sin esto el valor en MAYÚSCULAS
             # se "comía" la etiqueta siguiente en minúsculas ("ANDRES Primer Apellido").
+
+            # ── Etiquetas CSF / SAT ───────────────────────────────────────────
             Pattern(
                 name="csf_nombres",
                 regex=r"Nombre\s*\(s\)\s*:\s+(?-i:[A-ZÁÉÍÓÚÑ]{2,}(?:\s+[A-ZÁÉÍÓÚÑ]{2,}){0,3})",
@@ -1212,6 +1221,46 @@ def _build_analyzer_impl() -> AnalyzerEngine:
                 name="csf_nombre_encabezado",
                 regex=r"(?-i:[A-ZÁÉÍÓÚÑ]{2,}(?:\s+[A-ZÁÉÍÓÚÑ]{2,}){1,3})(?=\s+Nombre,\s+denominaci)",
                 score=0.95,
+            ),
+
+            # ── Etiquetas de identidad en documentos oficiales mexicanos ──────
+            # Titular: / Nombre del titular: / Nombre completo: / Nombre: /
+            # Nombre del solicitante: / Contribuyente: / Deudor: / Acreedor: /
+            # Interesado: / Promovente: / Persona física: / Paciente: (nombre)
+            Pattern(
+                name="etiqueta_titular",
+                regex=(
+                    r"(?i)(?:Titular|Nombre(?:\s+del\s+(?:titular|solicitante|contribuyente|"
+                    r"paciente|deudor|acreedor|interesado|promovente|menor|representado|"
+                    r"representante|causante|trabajador|empleado|asegurado|beneficiario|"
+                    r"quejoso|agraviado|imputado|acusado|sentenciado|v[ií]ctima))?|"
+                    r"Contribuyente|Persona\s+f[ií]sica|Paciente|Solicitante|"
+                    r"Deudor|Acreedor|Interesado|Promovente|Causante)"
+                    r"\s*:\s+" + _NOMBRE_CAPS
+                ),
+                score=0.92,
+            ),
+
+            # ── Nombre en actas / expedientes judiciales ──────────────────────
+            # "el C. ANDRES GALLEGOS DIAZ" / "el ciudadano ANDRES GALLEGOS DIAZ"
+            Pattern(
+                name="ciudadano_nombre",
+                regex=(
+                    r"(?i)(?:el\s+C\.|la\s+C\.|el\s+ciudadano|la\s+ciudadana|"
+                    r"el\s+se[ñn]or|la\s+se[ñn]ora|el\s+sr\.|la\s+sra\.)\s+"
+                    + _NOMBRE_CAPS
+                ),
+                score=0.88,
+            ),
+
+            # ── Nombre precedido de "A nombre de:" / "Expedido a:" ────────────
+            Pattern(
+                name="a_nombre_de",
+                regex=(
+                    r"(?i)(?:A\s+nombre\s+de|Expedido\s+a|Emitido\s+a|Girado\s+a)"
+                    r"\s*:\s+" + _NOMBRE_CAPS
+                ),
+                score=0.90,
             ),
         ],
         supported_language="es",
