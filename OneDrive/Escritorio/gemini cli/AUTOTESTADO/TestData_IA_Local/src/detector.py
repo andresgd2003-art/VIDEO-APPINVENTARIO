@@ -101,6 +101,15 @@ _RE_LABEL_PREFIX = re.compile(
     rf"^(?:(?:{_ETIQUETAS_LABEL})\s*:\s+)+",
     re.IGNORECASE,
 )
+# Prefijos narrativos sin ":" — se recortan del span MX_NOMBRE en _filtrar_falsos_positivos
+_RE_NARRATIVA_PREFIX = re.compile(
+    r"^(?:de\s+nombres?\s+|conocido\s+como\s+|conocida\s+como\s+|"
+    r"identificado\s+como\s+|identificada\s+como\s+|"
+    r"llamado\s+|llamada\s+|denominado\s+|denominada\s+|"
+    r"a\s+nombre\s+de\s+|expedido\s+a\s+|emitido\s+a\s+|girado\s+a\s+|"
+    r"(?:el|la)\s+(?:C\.\s+|ciudadano\s+|ciudadana\s+|se[ñn]or\s+|se[ñn]ora\s+|sr\.\s+|sra\.\s+|lic\.\s+))",
+    re.IGNORECASE,
+)
 
 # Roles legales genéricos que NO son nombres propios
 _RE_ROLES_LEGALES = re.compile(
@@ -404,6 +413,7 @@ def _filtrar_falsos_positivos(resultados: list, texto: str) -> list:
         # ── MX_NOMBRE (campos CSF "Nombre/Apellido: VALOR") ──
         # Recorta el prefijo de etiqueta para que el recuadro tape solo el valor.
         if r.entity_type == "MX_NOMBRE":
+            # 1. Prefijo tipo "LABEL: " (Titular:, Víctima:, etc.)
             m_lbl = _RE_LABEL_PREFIX.match(fragmento)
             if m_lbl:
                 try:
@@ -411,6 +421,15 @@ def _filtrar_falsos_positivos(resultados: list, texto: str) -> list:
                 except Exception:
                     pass
                 fragmento = texto[r.start:r.end]
+            # 2. Prefijos narrativos sin ":" ("de nombre X", "el ciudadano X", etc.)
+            if not m_lbl:
+                m_nar = _RE_NARRATIVA_PREFIX.match(fragmento)
+                if m_nar:
+                    try:
+                        r.start = r.start + len(m_nar.group(0))
+                    except Exception:
+                        pass
+                    fragmento = texto[r.start:r.end]
             if fragmento.strip():
                 limpios.append(r)
             continue
@@ -1224,33 +1243,84 @@ def _build_analyzer_impl() -> AnalyzerEngine:
             ),
 
             # ── Etiquetas de identidad en documentos oficiales mexicanos ──────
-            # Titular: / Nombre del titular: / Nombre completo: / Nombre: /
-            # Nombre del solicitante: / Contribuyente: / Deudor: / Acreedor: /
-            # Interesado: / Promovente: / Persona física: / Paciente: (nombre)
+            # Cubre: Titular, Nombre del X, Contribuyente, Víctima, Imputado,
+            # Acusado, Testigo, Ofendido, Denunciante, Quejoso, Promovente, etc.
             Pattern(
                 name="etiqueta_titular",
                 regex=(
-                    r"(?i)(?:Titular|Nombre(?:\s+del\s+(?:titular|solicitante|contribuyente|"
-                    r"paciente|deudor|acreedor|interesado|promovente|menor|representado|"
-                    r"representante|causante|trabajador|empleado|asegurado|beneficiario|"
-                    r"quejoso|agraviado|imputado|acusado|sentenciado|v[ií]ctima))?|"
-                    r"Contribuyente|Persona\s+f[ií]sica|Paciente|Solicitante|"
-                    r"Deudor|Acreedor|Interesado|Promovente|Causante)"
-                    r"\s*:\s+" + _NOMBRE_CAPS
+                    r"(?i)(?:"
+                    # Con "Nombre del/de la X:"
+                    r"Nombre(?:\s+(?:del?|de\s+la)\s+(?:titular|solicitante|contribuyente|"
+                    r"paciente|deudor|deudora|acreedor|acreedora|interesado|interesada|"
+                    r"promovente|menor|representado|representada|representante|causante|"
+                    r"trabajador|trabajadora|empleado|empleada|asegurado|asegurada|"
+                    r"beneficiario|beneficiaria|quejoso|quejosa|agraviado|agraviada|"
+                    r"imputado|imputada|acusado|acusada|sentenciado|sentenciada|"
+                    r"v[ií]ctima|ofendido|ofendida|denunciante|testigo|declarante|"
+                    r"arrendador|arrendadora|arrendatario|arrendataria|"
+                    r"actor|actora|demandado|demandada|apelante|recurrente|"
+                    r"tercero|tercera|fiador|fiadora|avalista|endosante))?|"
+                    # Etiquetas standalone directas
+                    r"Titular|Contribuyente|Persona\s+f[ií]sica|Paciente|Solicitante|"
+                    r"Deudor|Deudora|Acreedor|Acreedora|Interesado|Interesada|"
+                    r"Promovente|Causante|"
+                    r"V[ií]ctima|Ofendido|Ofendida|Agraviado|Agraviada|"
+                    r"Imputado|Imputada|Acusado|Acusada|Sentenciado|Sentenciada|"
+                    r"Testigo|Denunciante|Declarante|Quejoso|Quejosa|"
+                    r"Actor|Actora|Demandado|Demandada|Apelante|Recurrente|"
+                    r"Arrendador|Arrendadora|Arrendatario|Arrendataria|"
+                    r"Fiador|Fiadora|Avalista|Endosante|"
+                    r"Asegurado|Asegurada|Beneficiario|Beneficiaria|"
+                    r"Trabajador|Trabajadora|Empleado|Empleada"
+                    r")\s*:\s+" + _NOMBRE_CAPS
                 ),
                 score=0.92,
             ),
 
-            # ── Nombre en actas / expedientes judiciales ──────────────────────
-            # "el C. ANDRES GALLEGOS DIAZ" / "el ciudadano ANDRES GALLEGOS DIAZ"
+            # ── Nombre en actas / expedientes ("el C.", "el ciudadano", etc.) ─
             Pattern(
                 name="ciudadano_nombre",
                 regex=(
                     r"(?i)(?:el\s+C\.|la\s+C\.|el\s+ciudadano|la\s+ciudadana|"
-                    r"el\s+se[ñn]or|la\s+se[ñn]ora|el\s+sr\.|la\s+sra\.)\s+"
+                    r"el\s+se[ñn]or|la\s+se[ñn]ora|el\s+sr\.|la\s+sra\.|"
+                    r"el\s+lic\.|la\s+lic\.|c\.\s+)"
                     + _NOMBRE_CAPS
                 ),
                 score=0.88,
+            ),
+
+            # ── Nombre en narrativa legal sin ":" ─────────────────────────────
+            # "la víctima NOMBRE", "el imputado NOMBRE", "el testigo NOMBRE"
+            # Precede directamente al nombre en mayúsculas sin dos puntos.
+            Pattern(
+                name="narrativa_legal",
+                regex=(
+                    r"(?i)(?:la\s+v[ií]ctima|el\s+v[ií]ctima|"
+                    r"el\s+imputado|la\s+imputada|"
+                    r"el\s+acusado|la\s+acusada|"
+                    r"el\s+sentenciado|la\s+sentenciada|"
+                    r"el\s+ofendido|la\s+ofendida|"
+                    r"el\s+agraviado|la\s+agraviada|"
+                    r"el\s+testigo|la\s+testigo|"
+                    r"el\s+denunciante|la\s+denunciante|"
+                    r"el\s+quejoso|la\s+quejosa|"
+                    r"el\s+actor|la\s+actora|"
+                    r"el\s+demandado|la\s+demandada|"
+                    r"el\s+menor|la\s+menor)\s+"
+                    + _NOMBRE_CAPS
+                ),
+                score=0.85,
+            ),
+
+            # ── Nombre precedido de "de nombre" / "identificado como" ─────────
+            Pattern(
+                name="de_nombre",
+                regex=(
+                    r"(?i)(?:de\s+nombre|de\s+nombres|conocido\s+como|conocida\s+como|"
+                    r"identificado\s+como|identificada\s+como|llamado|llamada)\s+"
+                    + _NOMBRE_CAPS
+                ),
+                score=0.87,
             ),
 
             # ── Nombre precedido de "A nombre de:" / "Expedido a:" ────────────
