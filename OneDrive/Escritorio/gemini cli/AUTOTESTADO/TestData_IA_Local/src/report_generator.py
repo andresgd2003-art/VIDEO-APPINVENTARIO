@@ -1,9 +1,9 @@
-﻿import pymupdf
+import pymupdf
 import datetime
 from legal_mapper import get_legal_justification, get_active_estado, load_state_pack
 
-# CSS del acta (compartida por todas las pÃ¡ginas para que el estilo y los anchos
-# de columna sean idÃ©nticos al paginar manualmente y repetir el encabezado).
+# CSS del acta (compartida por todas las páginas para que el estilo y los anchos
+# de columna sean idénticos al paginar manualmente y repetir el encabezado).
 _ACTA_CSS = """
         body {
             font-family: 'Times New Roman', Georgia, 'DejaVu Serif', serif;
@@ -170,20 +170,20 @@ _ACTA_THEAD = """
 """
 
 def _acta_tabla(filas_html: str) -> str:
-    """Tabla de clasificaciÃ³n con encabezado + las filas indicadas."""
+    """Tabla de clasificación con encabezado + las filas indicadas."""
     return (
         '<table class="tabla-clasif">' + _ACTA_THEAD +
         "<tbody>" + filas_html + "</tbody></table>"
     )
 
 def _estimar_renglon(y0: float) -> int:
-    """Estima el renglÃ³n basado en la coordenada Y. Asume tamaÃ±o de renglÃ³n de 12-15 pts."""
+    """Estima el renglón basado en la coordenada Y. Asume tamaño de renglón de 12-15 pts."""
     return max(1, int(y0 / 15))
 
 def _formato_fundamento(legal_info: dict) -> str:
     """Devuelve el HTML de la celda de fundamento legal.
 
-    Si hay capa estatal, separa el marco general y el estatal en lÃ­neas
+    Si hay capa estatal, separa el marco general y el estatal en líneas
     etiquetadas para que se lea organizado en vez de un bloque corrido.
     """
     federal = legal_info.get("fundamento_federal")
@@ -198,11 +198,11 @@ def _formato_fundamento(legal_info: dict) -> str:
 
 def generate_justification_page(doc: pymupdf.Document, info_reporte: list[dict], filename: str, estado=None) -> None:
     """
-    Inserta una o mÃ¡s pÃ¡ginas al inicio del documento PDF que sirven como
-    Acta del ComitÃ© de Transparencia (Cuadro de ClasificaciÃ³n), justificando
+    Inserta una o más páginas al inicio del documento PDF que sirven como
+    Acta del Comité de Transparencia (Cuadro de Clasificación), justificando
     legalmente las entidades testadas.
 
-    Estilo: Institucional sobrio â€” tipografÃ­a serif, monocromÃ¡tico, sin colores.
+    Estilo: Institucional sobrio — tipografía serif, monocromático, sin colores.
     """
     if not info_reporte:
         return
@@ -218,10 +218,10 @@ def generate_justification_page(doc: pymupdf.Document, info_reporte: list[dict],
         custom_l = item.get("custom_label")
         custom_leg = item.get("custom_legal")
         custom_mot = item.get("custom_motivacion")
-        
+
         # Agrupar por entity_type, o por custom_label si es CUSTOM
         key = f"CUSTOM_{custom_l}" if et == "CUSTOM" else et
-        
+
         renglon = _estimar_renglon(item["y0"])
         pag = item["pagina"] + 1
         fue_manual = bool(item.get("manual", False))
@@ -231,7 +231,7 @@ def generate_justification_page(doc: pymupdf.Document, info_reporte: list[dict],
                 "custom_label": custom_l,
                 "custom_legal": custom_leg,
                 "custom_motivacion": custom_mot,
-                "ubicaciones": [], 
+                "ubicaciones": [],
                 "manual": False
             }
         tipos[key]["ubicaciones"].append(f"p.{pag} r.{renglon}")
@@ -273,14 +273,14 @@ def generate_justification_page(doc: pymupdf.Document, info_reporte: list[dict],
             marco_legal += " + " + pack["ley"]["nombre"]
     marco_legal = _html_mod.escape(marco_legal)
 
-    # â”€â”€ TamaÃ±o de hoja (igual al documento original) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── Tamaño de hoja (igual al documento original) ──────────────────────────
     if len(doc) > 0:
         w = doc[0].rect.width
         h = doc[0].rect.height
     else:
         w, h = 612, 792  # Carta por defecto
 
-    # â”€â”€ Secciones del acta como bloques independientes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── Secciones del acta como bloques independientes ────────────────────────
     preambulo = f"""
         <div class="header">
             <h1>Acta del Comit&eacute; de Transparencia</h1>
@@ -339,7 +339,7 @@ def generate_justification_page(doc: pymupdf.Document, info_reporte: list[dict],
         return pymupdf.open("pdf", hd.convert_to_pdf())
 
     def _medir(inner: str):
-        """Altura (pt) que ocuparÃ­a el bloque, medida con el motor Story."""
+        """Altura (pt) que ocuparía el bloque, medida con el motor Story."""
         try:
             story = pymupdf.Story(html=_wrap(inner), em=11)
             _, filled = story.place(pymupdf.Rect(0, 0, w, 1_000_000))
@@ -347,8 +347,8 @@ def generate_justification_page(doc: pymupdf.Document, info_reporte: list[dict],
         except Exception:
             return None
 
-    # â”€â”€ EstimaciÃ³n de alturas para empacar filas por pÃ¡gina â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    usable_h = h - 30 - 25          # mÃ¡rgenes verticales del body
+    # ── Estimación de alturas para empacar filas por página ──────────────────
+    usable_h = h - 30 - 25          # márgenes verticales del body
     cap = usable_h - 10             # margen de seguridad
     h_pre = _medir(preambulo) or 0.0
     h_head = _medir(_acta_tabla("")) or 0.0
@@ -358,7 +358,7 @@ def generate_justification_page(doc: pymupdf.Document, info_reporte: list[dict],
         m = _medir(_acta_tabla(r))
         alturas.append((m - h_head) if m else 42.0)
 
-    # â”€â”€ Repartir filas en pÃ¡ginas (con verificaciÃ³n de render por pÃ¡gina) â”€â”€â”€â”€â”€
+    # ── Repartir filas en páginas (con verificación de render por página) ─────
     acta_doc = pymupdf.open()
     n = len(filas)
     i = 0
@@ -366,7 +366,7 @@ def generate_justification_page(doc: pymupdf.Document, info_reporte: list[dict],
     cierre_insertado = False
     while i < n:
         disponible = cap - (h_pre if pagina_idx == 0 else 0.0) - h_head
-        # estimaciÃ³n inicial de cuÃ¡ntas filas caben
+        # estimación inicial de cuántas filas caben
         cnt, acc = 0, 0.0
         while i + cnt < n:
             ah = alturas[i + cnt]
@@ -377,7 +377,7 @@ def generate_justification_page(doc: pymupdf.Document, info_reporte: list[dict],
         cnt = max(cnt, 1)
 
         es_ultima_de_filas = (i + cnt >= n)
-        # Si es la Ãºltima tanda de filas, intentar incluir el cierre en la misma pÃ¡gina
+        # Si es la última tanda de filas, intentar incluir el cierre en la misma página
         pg = None
         if es_ultima_de_filas:
             inner_full = (preambulo if pagina_idx == 0 else "") + _acta_tabla("".join(filas[i:i + cnt])) + cierre
@@ -388,7 +388,7 @@ def generate_justification_page(doc: pymupdf.Document, info_reporte: list[dict],
             else:
                 cand.close()
 
-        # Render normal (solo filas) con retroceso si se desborda a 2+ pÃ¡ginas
+        # Render normal (solo filas) con retroceso si se desborda a 2+ páginas
         if pg is None:
             while True:
                 inner = (preambulo if pagina_idx == 0 else "") + _acta_tabla("".join(filas[i:i + cnt]))
@@ -402,7 +402,7 @@ def generate_justification_page(doc: pymupdf.Document, info_reporte: list[dict],
         i += cnt
         pagina_idx += 1
 
-    # Cierre en pÃ¡gina propia si no cupo con la Ãºltima tanda de filas
+    # Cierre en página propia si no cupo con la última tanda de filas
     if not cierre_insertado:
         acta_doc.insert_pdf(_to_pdf(cierre))
 
@@ -415,8 +415,8 @@ def generate_justification_page(doc: pymupdf.Document, info_reporte: list[dict],
         p = doc[pno]
         p.insert_text(
             (p.rect.width / 2 - 80, p.rect.height - 25),
-            f”Acta de Clasificacion — Pag. {pno - start_page + 1} de {acta_pages_count}”,
-            fontname=”helv”,
+            f"Acta de Clasificacion — Pag. {pno - start_page + 1} de {acta_pages_count}",
+            fontname="helv",
             fontsize=7.5,
             color=(0.45, 0.45, 0.45)
         )
