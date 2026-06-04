@@ -217,6 +217,125 @@ def clasificar_documento(doc: pymupdf.Document) -> dict:
     }
 
 
+def _ocr_jpeg_embebidos(page: pymupdf.Page, doc: pymupdf.Document) -> list[tuple] | None:
+    """
+    Si la página contiene imágenes JPEG embebidas que NO cubren la página completa
+    (ej. credenciales INE, pasaportes escaneados colocados en hoja carta), extrae
+    cada imagen directamente y le aplica OCR individual con preprocesamiento fuerte.
+
+    Retorna lista de palabras si aplica, None si debe usarse el flujo estándar.
+    """
+    import numpy as np
+    import cv2
+    from ocr_pipeline.preprocessing import add_padding
+
+    imgs = page.get_images(full=True)
+    if not imgs:
+        return None
+
+    page_area = page.rect.width * page.rect.height
+    img_info = page.get_image_info()
+
+    # Calcular cobertura máxima de una sola imagen
+    max_ratio = 0.0
+    for info in img_info:
+        bbox = info.get("bbox")
+        if bbox:
+            area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
+            max_ratio = max(max_ratio, area / page_area if page_area else 0)
+
+    # Si una imagen cubre >85% → es escáner full-page, usar flujo estándar
+    if max_ratio > 0.85:
+        return None
+
+    # Hay imágenes que no cubren la página completa (credenciales, documentos pequeños)
+    logger.info("Página con %d imagen(es) embebida(s) (<85%% cobertura) — OCR por imagen individual", len(imgs))
+
+    todas_palabras: list[tuple] = []
+    bloque_global = 0
+
+    for img_meta in imgs:
+        xref = img_meta[0]
+        try:
+            info = doc.extract_image(xref)
+        except Exception:
+            continue
+
+        if info["ext"] not in ("jpeg", "jpg", "png", "bmp", "tiff"):
+            continue
+
+        raw = info["image"]
+        arr = np.frombuffer(raw, dtype=np.uint8)
+        img_bgr = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+        if img_bgr is None:
+            continue
+
+        h_orig, w_orig = img_bgr.shape[:2]
+
+        # Preprocesamiento: escala ×2 + contraste + binarización adaptativa
+        img_up = cv2.resize(img_bgr, (w_orig * 2, h_orig * 2), interpolation=cv2.INTER_CUBIC)
+        img_gray = cv2.cvtColor(img_up, cv2.COLOR_BGR2GRAY)
+        img_denoised = cv2.fastNlMeansDenoising(img_gray, h=10, templateWindowSize=7, searchWindowSize=21)
+        # Binarización adaptativa — maneja fondos de color (INE, pasaportes)
+        img_bin = cv2.adaptiveThreshold(
+            img_denoised, 255,
+            cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 10
+        )
+        PADDING = 20
+        img_final = add_padding(img_bin, bordersize=PADDING)
+
+        palabras_raw = extract_words_from_image(img_final, lang='spa', min_conf=25)
+
+        # Las coordenadas del OCR están sobre la imagen escalada ×2
+        # Hay que mapearlas de vuelta al espacio PDF de la página.
+        # Buscamos el bbox de la imagen en la página para hacer la transformación.
+        img_bbox_pdf = None
+        for info_pg in img_info:
+            if info_pg.get("xref") == xref:
+                img_bbox_pdf = info_pg.get("bbox")
+                break
+        if img_bbox_pdf is None:
+            # Fallback: ocupar toda la página
+            img_bbox_pdf = (0, 0, page.rect.width, page.rect.height)
+
+        pdf_x0, pdf_y0, pdf_x1, pdf_y1 = img_bbox_pdf
+        pdf_w = pdf_x1 - pdf_x0
+        pdf_h = pdf_y1 - pdf_y0
+
+        img_w_proc = w_orig * 2 + PADDING * 2
+        img_h_proc = h_orig * 2 + PADDING * 2
+
+        _PAD_OCR = 1.0
+        for p in palabras_raw:
+            bx0 = p['bbox'][0] - PADDING
+            by0 = p['bbox'][1] - PADDING
+            bx1 = p['bbox'][2] - PADDING
+            by1 = p['bbox'][3] - PADDING
+
+            # Escalar de pixels de imagen procesada → puntos PDF
+            sx = pdf_w / (w_orig * 2) if w_orig else 1
+            sy = pdf_h / (h_orig * 2) if h_orig else 1
+
+            px0 = max(pdf_x0, pdf_x0 + bx0 * sx - _PAD_OCR)
+            py0 = max(pdf_y0, pdf_y0 + by0 * sy - _PAD_OCR)
+            px1 = min(pdf_x1, pdf_x0 + bx1 * sx + _PAD_OCR)
+            py1 = min(pdf_y1, pdf_y0 + by1 * sy + _PAD_OCR)
+
+            if px1 <= px0 or py1 <= py0:
+                continue
+
+            texto_raw = _normalizar_texto_ocr(p['text'])
+            if texto_raw.strip():
+                todas_palabras.append((px0, py0, px1, py1, texto_raw.strip(), bloque_global, 0, p['word_no']))
+
+        bloque_global += 1
+
+    if todas_palabras:
+        logger.info("OCR por imagen individual extrajo %d palabras", len(todas_palabras))
+        return _merge_split_ine_tokens(todas_palabras)
+    return None
+
+
 def _ocr_extract_words(page: pymupdf.Page) -> list[tuple]:
     """
     Rasteriza la página y usa EasyOCR (deep learning) para extraer palabras.
@@ -228,8 +347,16 @@ def _ocr_extract_words(page: pymupdf.Page) -> list[tuple]:
     import cv2
     from ocr_pipeline.preprocessing import add_padding
 
+    # Intentar primero el modo imagen-individual (credenciales, IDs en hoja carta)
+    try:
+        doc = page.parent
+        resultado_individual = _ocr_jpeg_embebidos(page, doc)
+        if resultado_individual is not None:
+            return resultado_individual
+    except Exception as e:
+        logger.warning("Fallo OCR por imagen individual, usando flujo estándar: %s", e)
+
     # Renderizamos DIRECTAMENTE a 300 DPI para preservar todo el detalle
-    # (72 DPI + upscale pierde información irrecuperablemente)
     RENDER_DPI = 300
     factor = RENDER_DPI / 72.0  # ~4.1667
     mat = pymupdf.Matrix(factor, factor)
@@ -241,35 +368,28 @@ def _ocr_extract_words(page: pymupdf.Page) -> list[tuple]:
     # NO binarizar ni invertir — EasyOCR necesita la textura original
     img_gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
     img_denoised = cv2.fastNlMeansDenoising(img_gray, h=10, templateWindowSize=7, searchWindowSize=21)
-    
-    # 3. Padding (20 px)
+
     PADDING = 20
     img_final = add_padding(img_denoised, bordersize=PADDING)
 
-    # 4. Extraer palabras con EasyOCR
     palabras_raw = extract_words_from_image(img_final, lang='spa', min_conf=30)
-    
+
     palabras: list[tuple] = []
     for p in palabras_raw:
-        # p['bbox'] está en [x0, y0, x1, y1] sobre img_final
-        # Revertir padding
         x0_up = p['bbox'][0] - PADDING
         y0_up = p['bbox'][1] - PADDING
         x1_up = p['bbox'][2] - PADDING
         y1_up = p['bbox'][3] - PADDING
-        
-        # Revertir upscale (dividir entre factor) + padding de 1 pt para
-        # compensar la imprecisión de los bboxes del OCR (letras cortadas)
-        _PAD_OCR = 1.0  # puntos PDF de margen extra por lado
+
+        _PAD_OCR = 1.0
         px0 = max(0, x0_up / factor - _PAD_OCR)
         py0 = max(0, y0_up / factor - _PAD_OCR)
         px1 = min(page.rect.width, x1_up / factor + _PAD_OCR)
         py1 = min(page.rect.height, y1_up / factor + _PAD_OCR)
-        
-        # Ignorar cajas inválidas
+
         if px1 <= px0 or py1 <= py0:
             continue
-            
+
         texto_raw = _normalizar_texto_ocr(p['text'])
         if texto_raw.strip():
             palabras.append((px0, py0, px1, py1, texto_raw.strip(), p['block_no'], 0, p['word_no']))
