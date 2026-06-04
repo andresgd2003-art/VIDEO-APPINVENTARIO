@@ -409,14 +409,14 @@ def generate_justification_page(doc: pymupdf.Document, info_reporte: list[dict],
     acta_pages_count = len(acta_doc)
     doc.insert_pdf(acta_doc)
 
-    # Pie de pÃ¡gina (paginaciÃ³n) en las pÃ¡ginas del acta reciÃ©n insertadas
+    # Pie de página (paginación) en las páginas del acta recién insertadas
     start_page = len(doc) - acta_pages_count
     for pno in range(start_page, len(doc)):
         p = doc[pno]
         p.insert_text(
             (p.rect.width / 2 - 80, p.rect.height - 25),
-            f"Acta de ClasificaciÃ³n â€” PÃ¡g. {pno - start_page + 1} de {acta_pages_count}",
-            fontname="helv",
+            f”Acta de Clasificacion — Pag. {pno - start_page + 1} de {acta_pages_count}”,
+            fontname=”helv”,
             fontsize=7.5,
             color=(0.45, 0.45, 0.45)
         )
