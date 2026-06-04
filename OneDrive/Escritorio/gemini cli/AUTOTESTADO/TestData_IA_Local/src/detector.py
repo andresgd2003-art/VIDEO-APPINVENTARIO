@@ -961,6 +961,36 @@ def _build_analyzer_impl() -> AnalyzerEngine:
                 ),
                 score=0.85,
             ),
+            # Formato INE / credencial: número DESNUDO sin la palabra "número".
+            # "CTO AMANECER 348 FRACC BRISAS DIAMANTE" — tipo de vialidad + nombre +
+            # número + asentamiento (FRACC/COL...). El nombre del asentamiento se acota
+            # a SOLO LETRAS para detenerse en el CP siguiente y no tragarse otros campos.
+            Pattern(
+                name="domicilio_ine_credencial",
+                regex=(
+                    r"(?i)(?:Cto\.?|Calle|Av\.?|Avenida|Blvd\.?|Boulevard|Calz\.?|Calzada"
+                    r"|Priv\.?|Privada|Cerrada|Circuito|And\.?|Andador|Retorno"
+                    r"|Carr\.?|Carretera|Camino|Prol\.?|Prolongaci[oó]n)"
+                    r"(?:\s+[A-Za-zÀ-ÿ]+){1,5}\s+\d{1,5}"
+                    r"\s+(?:Fracc\.?|Fraccionamiento|Col\.?|Colonia|U\.?\s*H\.?"
+                    r"|Unidad\s+Habitacional|Residencial|Barrio|Ejido)"
+                    r"(?:\s+[A-Za-zÀ-ÿ]{2,}){1,4}"
+                ),
+                score=0.85,
+            ),
+            # Domicilio precedido por la etiqueta "DOMICILIO" (INE sin FRACC/COL).
+            # Tipo de vialidad + nombre (letras) + número desnudo. Acotado a letras
+            # para no desbordarse hacia el CP / clave de elector siguientes.
+            Pattern(
+                name="domicilio_etiqueta_ine",
+                regex=(
+                    r"(?i)DOMICILIO\s+"
+                    r"(?:Cto\.?|Calle|Av\.?|Avenida|Blvd\.?|Boulevard|Calz\.?|Calzada"
+                    r"|Priv\.?|Privada|Cerrada|Circuito|And\.?|Andador|Retorno|Carr\.?|Camino)"
+                    r"(?:\s+[A-Za-zÀ-ÿ]+){1,6}\s+\d{1,5}"
+                ),
+                score=0.82,
+            ),
             # Formato CSF / formularios estructurados
             Pattern(
                 name="csf_vialidad",

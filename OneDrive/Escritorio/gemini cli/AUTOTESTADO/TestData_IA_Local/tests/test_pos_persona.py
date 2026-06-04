@@ -18,12 +18,17 @@ def analyzer():
 
 
 def _personas_detectadas(analyzer, texto):
-    """Devuelve la lista de fragmentos de tipo PERSON/Persona detectados."""
+    """Devuelve la lista de fragmentos de tipo nombre detectados.
+
+    Incluye MX_NOMBRE además de PERSON/Persona: un nombre tras una etiqueta legal
+    ('IMPUTADO:', 'Víctima:', 'Titular:') se captura como MX_NOMBRE (mayor prioridad),
+    que igualmente garantiza el testado del dato personal.
+    """
     resultados = analyze_page(analyzer, texto)
     return [
         texto[r.start:r.end]
         for r in resultados
-        if r.entity_type in ("PERSON", "Persona")
+        if r.entity_type in ("PERSON", "Persona", "MX_NOMBRE")
     ]
 
 
