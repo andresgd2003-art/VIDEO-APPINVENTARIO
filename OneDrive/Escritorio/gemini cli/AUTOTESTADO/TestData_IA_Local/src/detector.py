@@ -167,30 +167,96 @@ _RE_CTX_CP = re.compile(
     r'|manzana|privada|prolongaci[oó]n|prol\.?|supermanzana)\b',
     re.IGNORECASE,
 )
+_RE_CTX_DOMICILIO = re.compile(
+    r'\b(?:'
+    # Tipos de vialidad
+    r'calle|avenida|av\.?|boulevard|blvd\.?|calzada|calz\.?|carretera|camino|'
+    r'cerrada|privada|circuito|cto\.?|fraccionamiento|fracc\.?|retorno|andador|'
+    r'pasaje|paseo|anillo|ronda|prolongaci[oó]n|prol\.?|transversal|viaducto|'
+    # Tipos de asentamiento
+    r'colonia|col\.?|condominio|unidad\s+habitacional|u\.?\s*h\.?|residencial|'
+    r'barrio|bo\.?|ejido|rancher[ií]a|pueblo|sector|supermanzana|'
+    r'conjunto\s+habitacional|villa|'
+    # Elementos numerados
+    r'manzana|mza\.?|lote|lt\.?|interior|int\.?|n[uú]mero|n[uú]m\.?|'
+    r'piso|planta|departamento|depto\.?|apto\.?|apartamento|casa|esquina|esq\.?|'
+    # Frases de ubicación comunes en documentos oficiales
+    r'con\s+domicilio|domicilio\s+en|domicilio\s+particular|domicilio\s+fiscal|'
+    r'ubicado\s+en|ubicada\s+en|sito\s+en|sita\s+en|'
+    r'c[oó]digo\s+postal|c\.?\s*p\.?'
+    r')\b',
+    re.IGNORECASE,
+)
+_RE_CTX_LUGAR_NAC = re.compile(
+    r'\b(?:'
+    r'lugar\s+de\s+nacimiento|lugar\s+de\s+origen|lugar\s+natal|'
+    r'naci[oó]\s+en|nacido\s+en|nacida\s+en|nativo\s+de|nativa\s+de|'
+    r'originario\s+de|originaria\s+de|procedente\s+de|procedencia|'
+    r'estado\s+de\s+nacimiento|municipio\s+de\s+nacimiento|localidad\s+natal|'
+    r'registro\s+civil|acta\s+de\s+nacimiento|sede\s+de\s+registro|'
+    r'tierra\s+natal|origen\s+geogr[aá]fico'
+    r')\b',
+    re.IGNORECASE,
+)
+_RE_CTX_NACIONALIDAD = re.compile(
+    r'\b(?:'
+    r'nacionalidad|de\s+nacionalidad|nacionalidad\s+de|con\s+nacionalidad|'
+    r'ciudadano\s+de|ciudadana\s+de|s[uú]bdito\s+de|naturalizado|naturalizada|'
+    r'procedencia\s+nacional|extranjero|extranjera|extranjer[ií]a|'
+    r'pasaporte|visa|residencia\s+permanente|residencia\s+temporal|'
+    r'tenencia\s+de\s+la\s+nacionalidad|doble\s+nacionalidad'
+    r')\b',
+    re.IGNORECASE,
+)
 
 # ── Contextos para Datos Personales Sensibles ──────────────────────────────────
 _RE_CTX_ORIGEN_ETNICO = re.compile(
     r'\b(?:origen|etnia|etnicidad|raza|grupo|comunidad|pueblo|lengua|habla|nativ[oa]|'
-    r'ascendencia|descendencia|pertenencia|ind[ií]gena)\b',
+    r'ascendencia|descendencia|pertenencia|ind[ií]gena|'
+    r'de\s+origen|perteneciente\s+a|miembro\s+de|integrante\s+de|descendiente\s+de|'
+    r'pueblos\s+originarios|comunidades\s+ind[ií]genas|autoidentificaci[oó]n|'
+    r'lengua\s+materna|idioma\s+materno|costumbres|tradiciones|cultura\s+ind[ií]gena|'
+    r'diversidad\s+[eé]tnica|comunidades\s+ancestrales)\b',
     re.IGNORECASE,
 )
 _RE_CTX_RELIGION = re.compile(
     r'\b(?:religi[oó]n|creencia|culto|fe|iglesia|bautismo|practicante|congregaci[oó]n|dogma|'
-    r'rito|parroquia|templo|devoto|devota|feligr[eé]s|ministro\s+de\s+culto)\b',
+    r'rito|parroquia|templo|devoto|devota|feligr[eé]s|ministro\s+de\s+culto|'
+    r'de\s+religi[oó]n|confesi[oó]n\s+religiosa|afiliaci[oó]n\s+religiosa|'
+    r'profesi[oó]n\s+de\s+fe|credo|sinagoga|mezquita|monasterio|convento|'
+    r'orden\s+religiosa|sacerdote|sacerdotisa|di[aá]cono|rabino|im[aá]n|'
+    r'ap[oó]stata|conversi[oó]n|bautizado|bautizada|confirmado|confirmada)\b',
     re.IGNORECASE,
 )
 _RE_CTX_OPINION_POLITICA = re.compile(
-    r'\b(?:afiliaci[oó]n|partido|pol[ií]tica|voto|simpatizante|militante|eleccion(?:es)?|candidat[oa]|campa[ñn]a)\b',
+    r'\b(?:afiliaci[oó]n|partido|pol[ií]tica|voto|simpatizante|militante|eleccion(?:es)?|candidat[oa]|campa[ñn]a|'
+    r'afiliado\s+a|militante\s+de|simpatizante\s+de|votante\s+de|'
+    r'ideolog[ií]a|tendencia\s+pol[ií]tica|filiaci[oó]n\s+pol[ií]tica|'
+    r'coalici[oó]n|precandidatur[ao]|candidatur[ao]|disidente\s+pol[ií]tic[oa]|'
+    r'preso\s+pol[ií]tic[oa]|exiliado\s+pol[ií]tic[oa]|persecuci[oó]n\s+pol[ií]tica|'
+    r'conservador|progresista|revolucionari[oa]|populista|libertari[oa])\b',
     re.IGNORECASE,
 )
 _RE_CTX_PREFERENCIA_SEXUAL = re.compile(
     r'\b(?:preferencia|orientaci[oó]n|sexual|g[eé]nero|identidad|sexo|'
-    r'vida\s+[ií]ntima|conducta\s+sexual)\b',
+    r'vida\s+[ií]ntima|conducta\s+sexual|'
+    r'orientaci[oó]n\s+sexual|identidad\s+de\s+g[eé]nero|expresi[oó]n\s+de\s+g[eé]nero|'
+    r'vida\s+afectiva|uni[oó]n\s+civil|matrimonio\s+igualitario|'
+    r'familia\s+homoparental|comunidad\s+lgbtq|colectivo\s+lgbt|derechos\s+lgbt|'
+    r'transfobia|homofobia|discriminaci[oó]n\s+por\s+orientaci[oó]n|'
+    r'cambio\s+de\s+nombre|cambio\s+de\s+sexo|rectificaci[oó]n\s+de\s+acta|'
+    r'reasignaci[oó]n\s+de\s+sexo|reconocimiento\s+legal\s+de\s+g[eé]nero)\b',
     re.IGNORECASE,
 )
 _RE_CTX_BIOMETRICO = re.compile(
     r'\b(?:autenticaci[oó]n|registro|identificaci[oó]n|biometr[ií]a|captura|verificaci[oó]n|sistema|'
-    r'dactilar|lector|enrolamiento|escaneo|sensor)\b',
+    r'dactilar|lector|enrolamiento|escaneo|sensor|'
+    r'datos\s+biom[eé]tricos|informaci[oó]n\s+biom[eé]trica|plantilla\s+biom[eé]trica|'
+    r'patr[oó]n\s+dactilar|crestas\s+dactilares|geometr[ií]a\s+palmar|'
+    r'reconocimiento\s+de\s+voz|verificaci[oó]n\s+de\s+voz|'
+    r'perfil\s+gen[eé]tico|an[aá]lisis\s+gen[eé]tico|huella\s+gen[eé]tica|'
+    r'base\s+de\s+datos\s+biom[eé]trica|algoritmo\s+biom[eé]trico|'
+    r'comparaci[oó]n\s+biom[eé]trica|fusi[oó]n\s+biom[eé]trica)\b',
     re.IGNORECASE,
 )
 _RE_CTX_DIAGNOSTICO = re.compile(
@@ -198,7 +264,13 @@ _RE_CTX_DIAGNOSTICO = re.compile(
     r'hospital|m[eé]dico|salud|consulta|urgencia|condici[oó]n|'
     r'expediente\s+m[eé]dico|historial\s+cl[ií]nico|historia\s+cl[ií]nica|'
     r'nota\s+m[eé]dica|prescripci[oó]n|internamiento|cirug[ií]a|'
-    r'discapacidad|incapacidad\s+m[eé]dica|rehabilitaci[oó]n)\b',
+    r'discapacidad|incapacidad\s+m[eé]dica|rehabilitaci[oó]n|'
+    r'diagn[oó]stico\s+de|portador\s+de|portadora\s+de|'
+    r'infectado\s+de|infectada\s+de|contagiado\s+de|contagiada\s+de|'
+    r'aquejado\s+de|aquejada\s+de|afectado\s+de|afectada\s+de|'
+    r'antecedentes\s+m[eé]dicos|antecedentes\s+patol[oó]gicos|'
+    r'cuadro\s+cl[ií]nico|cuadro\s+sinto|pron[oó]stico|secuela|'
+    r'comorbilidad|certificado\s+m[eé]dico|informe\s+m[eé]dico)\b',
     re.IGNORECASE,
 )
 
@@ -420,6 +492,27 @@ def _filtrar_falsos_positivos(resultados: list, texto: str) -> list:
             if re.match(r'^\s*C\.?\s*P\.?\b', fragmento, re.IGNORECASE):
                 pass
             elif not _tiene_contexto(texto, r.start, r.end, _RE_CTX_CP, radio=60):
+                continue
+
+        # Contexto para domicilio: el patrón natural ya es bastante restrictivo,
+        # pero el contexto adicional reduce falsos positivos en listas sin número.
+        if r.entity_type == "MX_DOMICILIO":
+            # Patrones CSF (campos estructurados) se aceptan siempre.
+            # El patrón libre "Calle X Núm Y" solo requiere contexto si NO incluye número.
+            fragmento_dom = texto[r.start:r.end]
+            tiene_numero = bool(re.search(r'\d', fragmento_dom))
+            if not tiene_numero:
+                if not _tiene_contexto(texto, r.start, r.end, _RE_CTX_DOMICILIO, radio=80):
+                    continue
+
+        # Contexto para lugar de nacimiento: amplía detección en lenguaje narrativo
+        if r.entity_type == "MX_LUGAR_NAC":
+            if not _tiene_contexto(texto, r.start, r.end, _RE_CTX_LUGAR_NAC, radio=80):
+                continue
+
+        # Contexto para nacionalidad: rechaza "MEXICANA" sin indicador de nacionalidad
+        if r.entity_type == "MX_NACIONALIDAD":
+            if not _tiene_contexto(texto, r.start, r.end, _RE_CTX_NACIONALIDAD, radio=60):
                 continue
 
         # Filtros de contexto para Datos Sensibles (evita falsos positivos como "PAN" o "Católico" sin contexto)
