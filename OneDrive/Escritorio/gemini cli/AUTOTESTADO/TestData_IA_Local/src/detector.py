@@ -106,12 +106,19 @@ _RE_LABEL_PREFIX = re.compile(
     rf"^(?:(?:{_ETIQUETAS_LABEL})\s*:\s+)+",
     re.IGNORECASE,
 )
+# Etiqueta genérica que termina en ":" antes del nombre ("Nombre del solicitante:",
+# "A nombre de:"). Solo letras/espacios/paréntesis antes del ":" (no dígitos, para no
+# tragarse valores). Se usa como fallback de recorte del span MX_NOMBRE.
+_RE_LABEL_COLON = re.compile(
+    r"^(?:[A-Za-zÁÉÍÓÚÑáéíóúñ().]+\s+){0,4}[A-Za-zÁÉÍÓÚÑáéíóúñ().]+\s*:\s+"
+)
+
 # Prefijos narrativos sin ":" — se recortan del span MX_NOMBRE en _filtrar_falsos_positivos
 _RE_NARRATIVA_PREFIX = re.compile(
-    r"^(?:de\s+nombres?\s+|conocido\s+como\s+|conocida\s+como\s+|"
+    r"^(?:de\s+nombres?\s*:?\s+|conocido\s+como\s+|conocida\s+como\s+|"
     r"identificado\s+como\s+|identificada\s+como\s+|"
     r"llamado\s+|llamada\s+|denominado\s+|denominada\s+|"
-    r"a\s+nombre\s+de\s+|expedido\s+a\s+|emitido\s+a\s+|girado\s+a\s+|"
+    r"a\s+nombre\s+de\s*:?\s+|expedido\s+a\s*:?\s+|emitido\s+a\s*:?\s+|girado\s+a\s*:?\s+|"
     # Etiqueta INE: "NOMBRE" (opcionalmente con "SEXO H" intercalado por el layout)
     r"NOMBRE\s+(?:SEXO\s*[HM]?\s+)?|"
     r"(?:el|la)\s+(?:C\.\s+|ciudadano\s+|ciudadana\s+|se[ñn]or\s+|se[ñn]ora\s+|sr\.\s+|sra\.\s+|lic\.\s+))",
@@ -332,8 +339,12 @@ _TITULOS_SERVIDOR = re.compile(
     r'|Oficial|Agente\s+de\s+(?:Fuerza\s+Civil|Polic[i\xed]a)|Agente|Inspector'
     r'|Juez|Jueza|Magistrado|Magistrada'
     r'|Secretari[ao]\s+de\s+(?:Gesti[o\xf3]n|Acuerdos|Gobernaci[o\xf3]n|Estado|Seguridad)'
-    r'|Secretari[ao]\s+T[e\xe9]cnico|Secretari[ao]\s+(?:General|Ejecutivo|Ejecutiva)'
-    r'|Secretar[i\xed]a\s+de\s+(?:Gobernaci[o\xf3]n|Estado|Seguridad|Salud|Educaci[o\xf3]n)'
+    r'|Secretari[ao]\s+T[e\xe9]cnico|Secretari[ao]\s+(?:General|Ejecutivo|Ejecutiva|Auxiliar|Judicial)'
+    r'|Secretari[ao]\b'  # Secretaria/o de acuerdos judicial (servidor público)
+    r'|Secretar[i\xed]a\s+de\s+(?:Gobernaci[o\xf3]n|Estado|Seguridad|Salud|Educaci[o\xf3]n'
+    r'|Relaciones\s+Exteriores|Hacienda|Marina|(?:la\s+)?Defensa\s+Nacional|Defensa'
+    r'|Bienestar|Econom[i\xed]a|Energ[i\xed]a|Trabajo|Turismo|Cultura|Agricultura'
+    r'|Funci[o\xf3]n\s+P[u\xfa]blica|Medio\s+Ambiente|Comunicaciones|Infraestructura)'
     r'|Notari[ao]\s+P[u\xfa]blico'
     r'|Ciudadano\s+Juez|C\.\s+Juez'
     r'|Fiscal|Subprocurador|Procurador|Diputado|Diputada|Senador|Senadora'
@@ -348,8 +359,12 @@ _RE_TITULO_PREVIO = re.compile(
     r'|Oficial|Agente\s+de\s+(?:Fuerza\s+Civil|Polic[i\xed]a)|Agente|Inspector'
     r'|Juez|Jueza|Magistrado|Magistrada'
     r'|Secretari[ao]\s+de\s+(?:Gesti[o\xf3]n|Acuerdos|Gobernaci[o\xf3]n|Estado|Seguridad)'
-    r'|Secretari[ao]\s+T[e\xe9]cnico|Secretari[ao]\s+(?:General|Ejecutivo|Ejecutiva)'
-    r'|Secretar[i\xed]a\s+de\s+(?:Gobernaci[o\xf3]n|Estado|Seguridad|Salud|Educaci[o\xf3]n)'
+    r'|Secretari[ao]\s+T[e\xe9]cnico|Secretari[ao]\s+(?:General|Ejecutivo|Ejecutiva|Auxiliar|Judicial)'
+    r'|Secretari[ao]\b'  # Secretaria/o de acuerdos judicial (servidor público)
+    r'|Secretar[i\xed]a\s+de\s+(?:Gobernaci[o\xf3]n|Estado|Seguridad|Salud|Educaci[o\xf3]n'
+    r'|Relaciones\s+Exteriores|Hacienda|Marina|(?:la\s+)?Defensa\s+Nacional|Defensa'
+    r'|Bienestar|Econom[i\xed]a|Energ[i\xed]a|Trabajo|Turismo|Cultura|Agricultura'
+    r'|Funci[o\xf3]n\s+P[u\xfa]blica|Medio\s+Ambiente|Comunicaciones|Infraestructura)'
     r'|Notari[ao]\s+P[u\xfa]blico'
     r'|Ciudadano\s+Juez|C\.\s+Juez'
     r'|Fiscal|Subprocurador|Procurador|Diputado|Diputada|Senador|Senadora'
@@ -458,20 +473,16 @@ def _filtrar_falsos_positivos(resultados: list, texto: str) -> list:
         # ── MX_NOMBRE (campos CSF "Nombre/Apellido: VALOR") ──
         # Recorta el prefijo de etiqueta para que el recuadro tape solo el valor.
         if r.entity_type == "MX_NOMBRE":
-            # 1. Prefijo tipo "LABEL: " (Titular:, Víctima:, etc.)
-            m_lbl = _RE_LABEL_PREFIX.match(fragmento)
-            if m_lbl:
-                try:
-                    r.start = r.start + len(m_lbl.group(0))
-                except Exception:
-                    pass
-                fragmento = texto[r.start:r.end]
-            # 2. Prefijos narrativos sin ":" ("de nombre X", "el ciudadano X", etc.)
-            if not m_lbl:
-                m_nar = _RE_NARRATIVA_PREFIX.match(fragmento)
-                if m_nar:
+            # Recorta prefijos de etiqueta EN SECUENCIA (no excluyentes): cada uno
+            # avanza r.start sobre el fragmento actual hasta dejar solo el nombre.
+            #   1. "LABEL: " conocido (Titular:, Víctima:…)
+            #   2. narrativo sin ":" ("de nombre X", "Nombre [SEXO H]", "el C." …)
+            #   3. fallback: etiqueta genérica que termina en ":" ("del solicitante:")
+            for _trim_re in (_RE_LABEL_PREFIX, _RE_NARRATIVA_PREFIX, _RE_LABEL_COLON):
+                m_t = _trim_re.match(fragmento)
+                if m_t and m_t.end() > 0:
                     try:
-                        r.start = r.start + len(m_nar.group(0))
+                        r.start = r.start + m_t.end()
                     except Exception:
                         pass
                     fragmento = texto[r.start:r.end]
@@ -870,13 +881,23 @@ def _build_analyzer_impl() -> AnalyzerEngine:
                 ),
                 # Institución educativa del titular. Se EXCLUYE "Instituto Nacional X"
                 # (gobierno) al exigir Tecnológico/Politécnico tras "Instituto".
+                # El nombre tras la cabecera se captura CASE-SENSITIVE (primera letra
+                # mayúscula real) para no tragarse relleno en minúsculas ("Universidad
+                # como concepto general...") ni encadenar otra institución contigua.
+                # (?-i:...) fuerza mayúscula REAL en la primera letra del nombre
+                # (Presidio compila con IGNORECASE global). Sin esto se traga
+                # relleno en minúsculas ("Universidad como concepto general...").
                 Pattern(
                     name="institucion_edu",
                     regex=(
-                        r"(?i)\b(?:Universidad|Escuela|Colegio|Facultad|Centro\s+Universitario|"
-                        r"Instituto\s+Tecnol[oó]gico|Instituto\s+Polit[eé]cnico|Preparatoria|"
-                        r"Bachillerato|Normal\s+Superior|Tecnol[oó]gico\s+(?:de|Nacional))"
-                        r"(?:\s+(?:de|del|la|los|las|y|en)\b|\s+[A-ZÁÉÍÓÚÑ][\wÁÉÍÓÚÑáéíóúñ]*){1,7}"
+                        r"\b(?:Universidad|Escuela|Colegio|Facultad|"
+                        r"Centro\s+Universitario|Instituto\s+Tecnol[oó]gico|"
+                        r"Instituto\s+Polit[eé]cnico|Preparatoria|Bachillerato|"
+                        r"Normal\s+Superior|Tecnol[oó]gico\s+(?:de|Nacional))"
+                        r"(?:\s+(?:de|del|la|los|las|y|en)\b"
+                        r"|\s+(?!(?:Universidad|Escuela|Colegio|Instituto|Facultad|"
+                        r"Preparatoria|Bachillerato|Normal|Centro)\b)"
+                        r"(?-i:[A-ZÁÉÍÓÚÑ])[A-Za-zÁÉÍÓÚÑáéíóúñ]*){1,5}"
                     ),
                     score=0.7,
                 ),
@@ -1357,7 +1378,8 @@ def _build_analyzer_impl() -> AnalyzerEngine:
         r"Quejos[oa]|Actor|Actora|Demandad[oa]|Lugar|Fecha|Datos|Domicilio|"
         r"Nacionalidad|Estado|Municipio|Edad|Sexo|Tel[eé]fono|Correo|Pasaporte|"
         r"Curp|Rfc|Nss|Ine|Clave|Registrad[oa]|Madre|Padre|Programa|Nombre|"
-        r"Vialidad|Numero|N[uú]mero|Fraccionamiento|Colonia|Entidad|El|La|Los|Las"
+        r"Vialidad|Numero|N[uú]mero|Fraccionamiento|Colonia|Entidad|El|La|Los|Las|"
+        r"Fin|Otra|Otro|Domicilio|Institucion|Instituci[oó]n|Matricula|Matr[ií]cula"
     )
     _NOMBRE_VAL = (
         r"(?-i:[A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚÑáéíóúñ]+"
