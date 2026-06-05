@@ -95,60 +95,60 @@ _ALIAS_TIPOS: dict[str, str] = {
 }
 
 COLORES_ENTIDAD: dict[str, str] = {
-    # Identidad personal
-    "MX_CURP":      "#c0392b",
-    "MX_RFC_PF":    "#c0392b",
-    "MX_RFC_PM":    "#c0392b",
-    "MX_INE":       "#c0392b",
-    "MX_INE_FOLIO": "#c0392b",
-    "PERSON":       "#e67e22",
-    "Persona":      "#e67e22",
-    "MX_NOMBRE":    "#e67e22",
-    "Menor":        "#e74c3c",
-    "MX_IDCIF":     "#c0392b",
-    # Datos bancarios / patrimoniales
-    "MX_CLABE":     "#8e44ad",
-    "MX_TARJETA":   "#8e44ad",
-    "MX_CUENTA":    "#8e44ad",
-    "MX_MONTO":     "#6c3483",
-    # Vehículo
-    "MX_PLACA":     "#1a5276",
-    "MX_VIN":       "#1a5276",
-    # Contacto y localización
-    "MX_TEL":       "#2980b9",
-    "MX_EMAIL":     "#2980b9",
-    "MX_CP":        "#2980b9",
-    "LOCATION":     "#27ae60",
-    # Datos temporales / biométricos
-    "MX_FECHA_NAC": "#d35400",
-    "MX_EDAD":      "#d35400",
-    "MX_NSS":       "#8e44ad",
-    "MX_ESCOLAR":   "#8e44ad",
-    # Domicilio / localización geográfica
-    "MX_DOMICILIO":  "#1abc9c",
-    "MX_COLONIA":    "#1abc9c",
-    "MX_LUGAR_NAC":  "#1abc9c",
-    "MX_ENTIDAD_REGISTRO": "#1abc9c",
-    "MX_DIAGNOSTICO":"#e74c3c",
-    "MX_ORIGEN_ETNICO": "#a93226",
-    "MX_RELIGION":   "#8e44ad",
-    "MX_OPINION_POLITICA": "#16a085",
-    "MX_PREFERENCIA_SEXUAL": "#c0392b",
-    "MX_BIOMETRICO": "#d35400",
-    "MX_PASAPORTE":  "#c0392b",
-    # Datos civiles (acta de nacimiento)
-    "MX_CRIP":       "#c0392b",
-    "MX_NACIONALIDAD":"#2c3e50",
-    "MX_SEXO":       "#2c3e50",
-    # Elementos visuales (marcado manual)
-    "MX_FIRMA":      "#e74c3c",
-    "MX_QR":         "#e74c3c",
-    # GLiNER especiales
-    "Juez":         "#7f8c8d",
-    "Secretario":   "#7f8c8d",
-    "Diagnóstico":  "#16a085",
-    # Manual
-    "MANUAL":       "#8e44ad",
+    # ── Identidad de la persona (nombre + datos de nacimiento/identidad básica) ──
+    "PERSON":         "#e67e22",
+    "Persona":        "#e67e22",
+    "MX_NOMBRE":      "#e67e22",
+    "Menor":          "#e67e22",
+    "MX_LUGAR_NAC":   "#e67e22",
+    "MX_FECHA_NAC":   "#e67e22",
+    "MX_EDAD":        "#e67e22",
+    "MX_SEXO":        "#e67e22",
+    "MX_NACIONALIDAD":"#e67e22",
+    # ── Identificadores oficiales ──────────────────────────────────────────────
+    "MX_CURP":        "#c0392b",
+    "MX_RFC_PF":      "#c0392b",
+    "MX_RFC_PM":      "#c0392b",
+    "MX_INE":         "#c0392b",
+    "MX_INE_FOLIO":   "#c0392b",
+    "MX_IDCIF":       "#c0392b",
+    "MX_CRIP":        "#c0392b",
+    "MX_PASAPORTE":   "#c0392b",
+    "MX_NSS":         "#c0392b",
+    # ── Contacto y domicilio ───────────────────────────────────────────────────
+    "MX_TEL":         "#2980b9",
+    "MX_EMAIL":       "#2980b9",
+    "MX_CP":          "#2980b9",
+    "MX_DOMICILIO":   "#2980b9",
+    "MX_COLONIA":     "#2980b9",
+    "MX_ENTIDAD_REGISTRO": "#2980b9",
+    "LOCATION":       "#2980b9",
+    # ── Patrimonial / financiero ───────────────────────────────────────────────
+    "MX_CLABE":       "#8e44ad",
+    "MX_TARJETA":     "#8e44ad",
+    "MX_CUENTA":      "#8e44ad",
+    "MX_MONTO":       "#8e44ad",
+    # ── Vehículo / tránsito ────────────────────────────────────────────────────
+    "MX_PLACA":       "#1a5276",
+    "MX_VIN":         "#1a5276",
+    # ── Académico / laboral ────────────────────────────────────────────────────
+    "MX_ESCOLAR":     "#b9770e",
+    # ── Datos sensibles (cada categoría con color propio) ──────────────────────
+    "MX_DIAGNOSTICO": "#e74c3c",   # Salud
+    "Diagnóstico":    "#e74c3c",   # Salud (GLiNER) — mismo concepto, mismo color
+    "MX_ORIGEN_ETNICO": "#a93226", # Origen étnico/racial
+    "MX_RELIGION":    "#7d3c98",   # Creencias religiosas
+    "MX_OPINION_POLITICA": "#16a085",  # Opinión política / afiliación
+    "MX_PREFERENCIA_SEXUAL": "#d81b60",# Preferencia sexual
+    "MX_BIOMETRICO":  "#d35400",   # Datos biométricos
+    # ── Elementos visuales (firma, QR y códigos de barra) ──────────────────────
+    "MX_FIRMA":       "#34495e",
+    "MX_QR":          "#34495e",
+    # ── Servidores públicos (informativo — NO se testan) ───────────────────────
+    "Juez":           "#7f8c8d",
+    "Secretario":     "#7f8c8d",
+    # ── Marcado manual / otro ──────────────────────────────────────────────────
+    "MANUAL":         "#95a5a6",
 }
 COLOR_DEFAULT = "#d4ac0d"
 COLOR_DESELECCIONADO = "#aaaaaa"
@@ -544,20 +544,21 @@ class ValidadorPDFApp(ctk.CTk):
 
     def _construir_leyenda(self, parent) -> None:
         leyenda = [
-            ("#c0392b", "CURP/RFC/INE/Pasaporte/Sexual"),
-            ("#e67e22", "Persona / Menor"),
-            ("#8e44ad", "CLABE / Tarjeta / Religión"),
-            ("#6c3483", "Monto patrimonial"),
-            ("#1a5276", "Placa / VIN"),
-            ("#2980b9", "Tel / Email / CP"),
-            ("#27ae60", "Ubicación"),
-            ("#d35400", "Fecha nac. / Edad / Biométrico"),
-            ("#1abc9c", "Domicilio / Lugar nac. / Colonia"),
-            ("#2c3e50", "Nacionalidad / Sexo"),
-            ("#e74c3c", "Firma / QR / Menor / Diagnóstico"),
-            ("#16a085", "Diagnóstico / Op. Política"),
-            ("#a93226", "Origen Étnico"),
-            ("#8e44ad", "Marcado manual"),
+            ("#e67e22", "Identidad (nombre, nacimiento, edad, sexo, nacionalidad)"),
+            ("#c0392b", "Identificadores (CURP, RFC, INE, Pasaporte, NSS, CRIP)"),
+            ("#2980b9", "Contacto y domicilio (Tel, Email, CP, calle, colonia)"),
+            ("#8e44ad", "Patrimonial (CLABE, tarjeta, cuenta, monto)"),
+            ("#1a5276", "Vehículo (placa, VIN)"),
+            ("#b9770e", "Escolar (matrícula, institución, carrera)"),
+            ("#e74c3c", "Salud / diagnóstico"),
+            ("#a93226", "Origen étnico"),
+            ("#7d3c98", "Religión"),
+            ("#16a085", "Opinión política / afiliación"),
+            ("#d81b60", "Preferencia sexual"),
+            ("#d35400", "Biométrico"),
+            ("#34495e", "Visual (firma, QR, código de barras)"),
+            ("#7f8c8d", "Servidor público (no se testa)"),
+            ("#95a5a6", "Marcado manual"),
         ]
         marco = ctk.CTkFrame(
             parent, fg_color=COL_APP_BG, corner_radius=10,

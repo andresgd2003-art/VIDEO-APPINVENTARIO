@@ -222,7 +222,6 @@ def generate_justification_page(doc: pymupdf.Document, info_reporte: list[dict],
         # Agrupar por entity_type, o por custom_label si es CUSTOM
         key = f"CUSTOM_{custom_l}" if et == "CUSTOM" else et
 
-        renglon = _estimar_renglon(item["y0"])
         pag = item["pagina"] + 1
         fue_manual = bool(item.get("manual", False))
         if key not in tipos:
@@ -234,7 +233,8 @@ def generate_justification_page(doc: pymupdf.Document, info_reporte: list[dict],
                 "ubicaciones": [],
                 "manual": False
             }
-        tipos[key]["ubicaciones"].append(f"p.{pag} r.{renglon}")
+        # Solo PÁGINA (sin renglón): las ubicaciones se listan por número de página.
+        tipos[key]["ubicaciones"].append(pag)
         tipos[key]["manual"] = tipos[key]["manual"] or fue_manual
 
     filas = []
@@ -243,9 +243,9 @@ def generate_justification_page(doc: pymupdf.Document, info_reporte: list[dict],
         num += 1
         entity_type = info["entity_type"]
         legal_info = get_legal_justification(entity_type, info["custom_label"], info["custom_legal"], info["custom_motivacion"], estado=estado)
-        # Deduplicar y ordenar ubicaciones
+        # Páginas únicas en orden ascendente: "p.1, p.3"
         ubics = sorted(set(info["ubicaciones"]))
-        ubic_str = ", ".join(ubics)
+        ubic_str = ", ".join(f"p.{p}" for p in ubics)
         origen = " <i>(manual)</i>" if info["manual"] else ""
 
         filas.append(f"""
@@ -322,11 +322,9 @@ def generate_justification_page(doc: pymupdf.Document, info_reporte: list[dict],
             </div>
         </div>
         <p class="nota">
-            Documento generado autom&aacute;ticamente por ANONIMA. La clasificaci&oacute;n
-            fue realizada mediante an&aacute;lisis automatizado de datos personales con
-            tecnolog&iacute;a de procesamiento de lenguaje natural (Presidio/GLiNER).
-            El responsable deber&aacute; verificar y validar el contenido antes de su
-            formalizaci&oacute;n.
+            Documento generado autom&aacute;ticamente por ANONIMA mediante an&aacute;lisis
+            automatizado de datos personales. El responsable deber&aacute; verificar y
+            validar el contenido antes de su formalizaci&oacute;n.
         </p>
     """
 

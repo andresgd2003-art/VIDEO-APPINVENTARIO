@@ -1291,11 +1291,31 @@ def _build_analyzer_impl() -> AnalyzerEngine:
 
     recognizers.append(PatternRecognizer(
         supported_entity="MX_OPINION_POLITICA",
-        patterns=[Pattern(
-            name="opinion_politica",
-            regex=r"\b(?:PAN|PRI|PRD|Morena|PVEM|PT|Movimiento\s+Ciudadano|Acci[oó]n\s+Nacional|Revolucionario\s+Institucional|Revoluci[oó]n\s+Democr[aá]tica)\b",
-            score=0.8,
-        )],
+        patterns=[
+            Pattern(
+                name="opinion_politica",
+                regex=r"\b(?:PAN|PRI|PRD|Morena|PVEM|PT|Movimiento\s+Ciudadano|Acci[oó]n\s+Nacional|Revolucionario\s+Institucional|Revoluci[oó]n\s+Democr[aá]tica)\b",
+                score=0.8,
+            ),
+            # Partido político por nombre completo: "Partido Acción Nacional"
+            Pattern(
+                name="partido_nombre",
+                regex=r"Partido(?:\s+(?:de|del|la|los|las|y)\b|\s+(?-i:[A-ZÁÉÍÓÚÑ])[A-Za-zÁÉÍÓÚÑáéíóúñ]*){1,5}",
+                score=0.75,
+            ),
+            # Afiliación SINDICAL (dato sensible, Art. 3 LFPDPPP): "Sindicato Nacional
+            # de Trabajadores...", "afiliación sindical", "sindicalizado".
+            Pattern(
+                name="sindicato_nombre",
+                regex=r"Sindicato(?:\s+(?:de|del|la|los|las|y|[ÚU]nico|Nacional|Aut[oó]nomo)\b|\s+(?-i:[A-ZÁÉÍÓÚÑ])[A-Za-zÁÉÍÓÚÑáéíóúñ]*){1,7}",
+                score=0.78,
+            ),
+            Pattern(
+                name="afiliacion_sindical",
+                regex=r"\bafiliaci[oó]n\s+sindical\b|\bsindicalizad[oa]\b",
+                score=0.7,
+            ),
+        ],
         supported_language="es",
     ))
 
