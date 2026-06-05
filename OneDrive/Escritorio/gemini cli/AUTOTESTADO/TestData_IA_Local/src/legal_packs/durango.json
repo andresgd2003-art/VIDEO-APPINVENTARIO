@@ -1,0 +1,18 @@
+{
+  "estado": "Durango",
+  "ley": {
+    "nombre": "Ley de Protección de Datos Personales en Posesión de Sujetos Obligados del Estado de Durango y sus Municipios",
+    "ultima_reforma": "DEC.366, P.O. 20 Ext. del 27 de diciembre de 2025"
+  },
+  "ley_transparencia": {
+    "nombre": "Ley de Transparencia y Acceso a la Información Pública del Estado de Durango y sus Municipios",
+    "ultima_reforma": "DEC.365, P.O. 20 Ext. del 27 de diciembre de 2025",
+    "articulo_confidencial": "110",
+    "nota_vigencia": "Art. 110 VERIFICADO contra el texto oficial DEC.365 P.O. 27-dic-2025 (iepcdurango.mx): párrafo 1 = información confidencial con datos personales; párrafo 3 = secretos bancario, fiduciario, industrial, comercial, fiscal, bursátil y postal. Art. 7 de la Ley de Datos también verificado (congresodurango.gob.mx). El texto íntegro del DEC.366 (Ley de Datos) aún no está indexado públicamente: las fracciones Art. 3 IX/X y el Art. 15 se conservan conforme al decreto y al modelo federal armonizado; pendiente de cotejo con el P.O. cuando se publique en línea."
+  },
+  "fundamento_por_categoria": {
+    "personal": "Art. 3, fracción IX de la Ley de Protección de Datos Personales en Posesión de Sujetos Obligados del Estado de Durango y sus Municipios (DEC.366, P.O. 27-dic-2025), que define como dato personal cualquier información concerniente a una persona identificada o identificable, en relación con el Art. 110 de la Ley de Transparencia y Acceso a la Información Pública del Estado de Durango y sus Municipios (DEC.365, P.O. 27-dic-2025), que clasifica como información confidencial la que contiene datos personales.",
+    "patrimonial": "Art. 3, fracción IX de la Ley de Protección de Datos Personales en Posesión de Sujetos Obligados del Estado de Durango y sus Municipios (DEC.366, P.O. 27-dic-2025), en relación con el Art. 110 de la Ley de Transparencia y Acceso a la Información Pública del Estado de Durango y sus Municipios (DEC.365, P.O. 27-dic-2025), que considera información confidencial los secretos bancario, fiduciario, industrial, comercial, fiscal, bursátil y postal cuya titularidad corresponda a particulares.",
+    "sensible": "Art. 3, fracción X (definición de datos personales sensibles), Art. 7 (regla general que prohíbe su tratamiento salvo consentimiento expreso) y Art. 15, último párrafo (consentimiento expreso y por escrito mediante firma autógrafa o electrónica, salvo las excepciones del Art. 16) de la Ley de Protección de Datos Personales en Posesión de Sujetos Obligados del Estado de Durango y sus Municipios (DEC.366, P.O. 27-dic-2025), en relación con el Art. 110 de la Ley de Transparencia y Acceso a la Información Pública del Estado de Durango y sus Municipios (información confidencial)."
+  }
+}

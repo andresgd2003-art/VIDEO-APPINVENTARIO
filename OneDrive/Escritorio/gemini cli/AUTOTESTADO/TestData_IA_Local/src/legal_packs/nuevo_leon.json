@@ -1,0 +1,18 @@
+{
+  "estado": "Nuevo León",
+  "ley": {
+    "nombre": "Ley de Protección de Datos Personales en Posesión de Sujetos Obligados del Estado de Nuevo León",
+    "ultima_reforma": "Texto original publicado en el Periódico Oficial Núm. 153 III del 11 de diciembre de 2019 (Decreto Núm. 193, LXXV Legislatura)"
+  },
+  "ley_transparencia": {
+    "nombre": "Ley de Transparencia y Acceso a la Información Pública del Estado de Nuevo León",
+    "ultima_reforma": "Publicada originalmente en P.O. 83-III del 1 de julio de 2016 (Decreto Núm. 119); reformas posteriores integradas por el INFONL (incluye reubicación P.O. 20-ago-2021 y reforma de 17-may-2023). Aún no armonizada con la reforma federal del 20/21-mar-2025.",
+    "articulo_confidencial": "141",
+    "nota_vigencia": "Art. 141 confirmado como información confidencial que contiene datos personales (verificado con documentos oficiales de sujetos obligados de NL, 2022-2023). El Estado de Nuevo León no ha expedido aún la ley armonizada con la reforma federal del 21-mar-2025 (transición estatal en curso)."
+  },
+  "fundamento_por_categoria": {
+    "personal": "Art. 3, fracción X de la Ley de Protección de Datos Personales en Posesión de Sujetos Obligados del Estado de Nuevo León (P.O. 11-dic-2019), que define como dato personal cualquier información concerniente a una persona física identificada o identificable, en relación con el Art. 141, inciso a) de la Ley de Transparencia y Acceso a la Información Pública del Estado de Nuevo León (P.O. 15-abr-2022), que considera información confidencial la que contiene datos personales.",
+    "patrimonial": "Art. 3, fracción X de la Ley de Protección de Datos Personales en Posesión de Sujetos Obligados del Estado de Nuevo León (P.O. 11-dic-2019), en relación con el Art. 141, inciso b) de la Ley de Transparencia y Acceso a la Información Pública del Estado de Nuevo León, que considera información confidencial los secretos bancario, fiduciario, industrial, comercial, fiscal, bursátil y postal cuya titularidad corresponda a particulares.",
+    "sensible": "Art. 3, fracción XI de la Ley de Protección de Datos Personales en Posesión de Sujetos Obligados del Estado de Nuevo León (P.O. 11-dic-2019), que define los datos personales sensibles como aquellos referidos a la esfera más íntima del titular —incluyendo de forma expresa los datos genéticos y biométricos—, en relación con su Art. 22, que exige el consentimiento expreso y por escrito del titular para su tratamiento, y con el Art. 141, inciso a) de la Ley de Transparencia y Acceso a la Información Pública del Estado de Nuevo León (información confidencial)."
+  }
+}

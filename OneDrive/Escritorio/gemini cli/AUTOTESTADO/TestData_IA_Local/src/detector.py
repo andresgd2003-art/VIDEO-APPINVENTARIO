@@ -961,8 +961,9 @@ def _build_analyzer_impl() -> AnalyzerEngine:
             patterns=[
                 Pattern(
                     name="monto_pattern",
-                    # Montos con signo de pesos: $3,500.00 / $845,000.00
-                    regex=r"\$[\d,]+(?:\.\d{2})?",
+                    # Montos con signo de pesos: $3,500.00 / $845,000.00 / $ 1,250,340.00 M.N.
+                    # Tolera espacio opcional tras "$" y montos grandes con varias comas.
+                    regex=r"\$\s?[\d,]+(?:\.\d{2})?(?:\s*M\.?\s*N\.?)?",
                     score=0.7,
                 ),
                 Pattern(
@@ -1160,6 +1161,32 @@ def _build_analyzer_impl() -> AnalyzerEngine:
                 # línea, se desbordaba hasta el pie de página).
                 regex=r"(?:Entre\s+Calle|Y\s+Calle)\s*:\s*(?-i:[A-ZÁÉÍÓÚÑ]{2,}(?:\s+[A-ZÁÉÍÓÚÑ]{2,}){0,4})",
                 score=0.85,
+            ),
+            # Etiqueta "Vialidad:" (CSF/INE variantes) seguida de tipo opcional
+            # (EJE VIAL incluido) + nombre + número desnudo.
+            #   "Vialidad: EJE VIAL Lazaro Cardenas 1250"
+            Pattern(
+                name="vialidad_etiqueta",
+                regex=(
+                    r"(?i)Vialidad\s*:\s+"
+                    r"(?:Eje\s+Vial|Calle|Av\.?|Avenida|Blvd\.?|Boulevard|Calz\.?|Calzada"
+                    r"|Priv\.?|Privada|Cda\.?|Cerrada|Circuito|Diagonal|Peatonal"
+                    r"|And\.?|Andador|Retorno|Carr\.?|Carretera|Camino|Prol\.?)?"
+                    r"(?:\s*[A-Za-zÀ-ÿ]+){1,6}\s+\d{1,5}"
+                ),
+                score=0.85,
+            ),
+            # Vialidad con número desnudo y tipo explícito (sin etiqueta previa).
+            # Refuerza cobertura de "EJE VIAL/Calle/Calz/Priv/Cda/Diagonal/Peatonal".
+            # Exige número (\d{1,5}) → no captura "calle" en oraciones genéricas.
+            Pattern(
+                name="vialidad_tipo_numero",
+                regex=(
+                    r"(?i)\b(?:Eje\s+Vial|Calz\.?|Calzada|Priv\.?|Privada|Cda\.?|Cerrada"
+                    r"|Diagonal|Peatonal|Prol\.?|Prolongaci[oó]n)"
+                    r"(?:\s+[A-Za-zÀ-ÿ]+){1,6}\s+\d{1,5}\b"
+                ),
+                score=0.8,
             ),
         ],
         supported_language="es",
@@ -1441,6 +1468,8 @@ def _build_analyzer_impl() -> AnalyzerEngine:
                     r"V[ií]ctima|Ofendido|Ofendida|Agraviado|Agraviada|"
                     r"Imputado|Imputada|Acusado|Acusada|Sentenciado|Sentenciada|"
                     r"Testigo|Denunciante|Declarante|Quejoso|Quejosa|"
+                    r"Albacea|Coadyuvante|Heredero|Heredera|Legatario|Legataria|"
+                    r"Cesionario|Cesionaria|Cedente|Otorgante|Compareciente|"
                     r"Actor|Actora|Demandado|Demandada|Apelante|Recurrente|"
                     r"Arrendador|Arrendadora|Arrendatario|Arrendataria|"
                     r"Fiador|Fiadora|Avalista|Endosante|"
@@ -1549,7 +1578,7 @@ def _build_analyzer_impl() -> AnalyzerEngine:
             Pattern(
                 name="lugar_nac_acta",
                 # "LUGAR DE NACIMIENTO DURANGO DURANGO DURANGO MEXICO"
-                regex=r"(?i)LUGAR\s+DE\s+NACIMIENTO\s+[A-Z\u00C1\u00C9\u00CD\u00D3\u00DA\u00D1\s]{4,80}?(?=\s+(?:LOCALIDAD|PADRES|DATOS|NOMBRE))",
+                regex=r"(?i)LUGAR\s+DE\s+NACIMIENTO\s+[A-Z\u00C1\u00C9\u00CD\u00D3\u00DA\u00D1\s]{4,80}?(?=\s+(?:LOCALIDAD|PADRES|DATOS|NOMBRE|SEXO|NACIONALIDAD|CURP)\b|\s*$|\n)",
                 score=0.85,
             ),
         ],
@@ -1561,7 +1590,7 @@ def _build_analyzer_impl() -> AnalyzerEngine:
         supported_entity="MX_NACIONALIDAD",
         patterns=[Pattern(
             name="nacionalidad_pattern",
-            regex=r"(?i)NACIONALIDAD\s+(?:MEXICANA|EXTRANJERA|[A-Z\u00C1\u00C9\u00CD\u00D3\u00DA\u00D1]{4,20})",
+            regex=r"(?i)NACIONALIDAD\s*:?\s+(?:MEXICANA|EXTRANJERA|[A-Z\u00C1\u00C9\u00CD\u00D3\u00DA\u00D1]{4,20})",
             score=0.75,
         )],
         supported_language="es",

@@ -1,8 +1,25 @@
+# ── MARCO FEDERAL VIGENTE (verificado 2026, fuentes oficiales) ──────────────
+# Reforma estructural de transparencia: el DECRETO publicado en el DOF el
+# 20-mar-2025 (vigente 21-mar-2025) EXPIDIÓ tres leyes NUEVAS, abrogando las
+# anteriores del mismo nombre, y extinguió al INAI (funciones transferidas a la
+# Secretaría Anticorrupción y Buen Gobierno y al órgano "Transparencia para el
+# Pueblo"). Las siglas se conservan:
+#   • LGTAIP  = Ley General de Transparencia y Acceso a la Información Pública
+#               (nueva, orig. DOF 20-mar-2025). Art. 116 = información
+#               confidencial con datos personales (VIGENTE, sin cambio de número).
+#               Art. 115 = información confidencial de datos sensibles; Art. 110
+#               = información reservada (prueba de daño).
+#   • LGPDPPSO = Ley General de Protección de Datos Personales en Posesión de
+#               Sujetos Obligados (nueva, orig. DOF 20-mar-2025; última reforma
+#               DOF 14-nov-2025). Art. 3, Fr. IX = "Datos personales"; Art. 3,
+#               Fr. X = "Datos personales sensibles". (En la ley ABROGADA el dato
+#               personal estaba en otra fracción; por eso se actualizó a Fr. IX.)
+# Detalle y URLs oficiales en: legal_packs/REFERENCIAS_LEYES.md
 LEGAL_MAPPING = {
     # ── PERSONAS / IDENTIDADES ──────────────────────────────────────────────
     "PERSON": {
         "descripcion": "Nombre de persona física",
-        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO",
+        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO",
         "motivacion": (
             "Constituye dato personal que hace identificable a una persona física. "
             "Su divulgación afecta directamente la privacidad del titular (Art. 6 Const.)."
@@ -10,7 +27,7 @@ LEGAL_MAPPING = {
     },
     "Persona": {
         "descripcion": "Nombre de persona física",
-        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO",
+        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO",
         "motivacion": (
             "Dato personal de identificación directa. Testado para proteger la "
             "identidad de la persona física involucrada en el documento."
@@ -32,7 +49,7 @@ LEGAL_MAPPING = {
     "MX_CURP": {
         "descripcion": "Clave Única de Registro de Población (CURP)",
         "fundamento": (
-            "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO; "
+            "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO; "
             "Acuerdo por el que se establece el RENAPO (DOF 1990); "
             "Ley General de Población, Art. 85 Bis"
         ),
@@ -45,7 +62,7 @@ LEGAL_MAPPING = {
     "MX_RFC_PF": {
         "descripcion": "Registro Federal de Contribuyentes (Persona Física)",
         "fundamento": (
-            "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO; "
+            "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO; "
             "Código Fiscal de la Federación (CFF), Art. 27"
         ),
         "motivacion": (
@@ -57,7 +74,7 @@ LEGAL_MAPPING = {
     "MX_INE": {
         "descripcion": "Clave de Elector (Credencial INE)",
         "fundamento": (
-            "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO; "
+            "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO; "
             "Ley General de Instituciones y Procedimientos Electorales (LEGIPE), Art. 9"
         ),
         "motivacion": (
@@ -79,7 +96,7 @@ LEGAL_MAPPING = {
     "MX_NSS": {
         "descripcion": "Número de Seguridad Social (NSS/IMSS)",
         "fundamento": (
-            "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO; "
+            "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO; "
             "Ley del Seguro Social, Art. 15, Fracción I"
         ),
         "motivacion": (
@@ -90,7 +107,7 @@ LEGAL_MAPPING = {
     },
     "MX_ESCOLAR": {
         "descripcion": "Dato escolar (matrícula, institución educativa, carrera o programa)",
-        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO",
+        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO",
         "motivacion": (
             "La matrícula, institución educativa, carrera o programa que cursa el titular "
             "constituye un dato personal de carácter académico. Asociado al nombre, identifica "
@@ -102,7 +119,7 @@ LEGAL_MAPPING = {
     # ── CONTACTO ─────────────────────────────────────────────────────────────
     "MX_EMAIL": {
         "descripcion": "Correo electrónico particular",
-        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO",
+        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO",
         "motivacion": (
             "Dato personal de contacto directo. Identificado como correo privado "
             "(no institucional *.gob.mx). Su exposición facilita acoso y suplantación."
@@ -110,7 +127,7 @@ LEGAL_MAPPING = {
     },
     "MX_TEL": {
         "descripcion": "Número telefónico",
-        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO",
+        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO",
         "motivacion": (
             "Dato personal de contacto de la persona física. "
             "Permite localización directa del titular."
@@ -120,7 +137,7 @@ LEGAL_MAPPING = {
     # ── DOMICILIO / UBICACIÓN ─────────────────────────────────────────────────
     "MX_DOMICILIO": {
         "descripcion": "Domicilio particular (calle, número, localidad)",
-        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO",
+        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO",
         "motivacion": (
             "Dato de ubicación que revela la residencia habitual de una persona física. "
             "Su divulgación expone al titular a riesgos de seguridad personal."
@@ -128,7 +145,7 @@ LEGAL_MAPPING = {
     },
     "MX_COLONIA": {
         "descripcion": "Colonia o asentamiento (parte de domicilio)",
-        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO",
+        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO",
         "motivacion": (
             "Dato ligado a la ubicación y domicilio particular. "
             "Combinado con otros datos identifica inequívocamente la residencia del titular."
@@ -144,7 +161,7 @@ LEGAL_MAPPING = {
     },
     "LOCATION": {
         "descripcion": "Referencia geográfica asociada al titular",
-        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO",
+        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO",
         "motivacion": (
             "Ubicación geográfica que, en el contexto del documento, permite identificar "
             "o ubicar a la persona física titular. Protegida bajo el principio de minimización "
@@ -154,7 +171,7 @@ LEGAL_MAPPING = {
     },
     "MX_ENTIDAD_REGISTRO": {
         "descripcion": "Entidad de Registro de Nacimiento",
-        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO",
+        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO",
         "motivacion": (
             "Dato biográfico que revela el lugar de nacimiento o registro civil del titular. "
             "Permite perfilamiento de origen de la persona física."
@@ -164,7 +181,7 @@ LEGAL_MAPPING = {
     # ── BIOGRÁFICOS ───────────────────────────────────────────────────────────
     "MX_FECHA_NAC": {
         "descripcion": "Fecha de nacimiento",
-        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO",
+        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO",
         "motivacion": (
             "Dato biográfico que, en combinación con el nombre, permite la identificación "
             "precisa de la persona física y su perfilamiento demográfico."
@@ -172,7 +189,7 @@ LEGAL_MAPPING = {
     },
     "MX_EDAD": {
         "descripcion": "Edad de la persona",
-        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO",
+        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO",
         "motivacion": "Dato personal biográfico de carácter identificador.",
     },
 
@@ -180,7 +197,7 @@ LEGAL_MAPPING = {
     "MX_CLABE": {
         "descripcion": "CLABE Interbancaria",
         "fundamento": (
-            "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO; "
+            "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO; "
             "Ley de Instituciones de Crédito, Art. 117 (secreto bancario)"
         ),
         "motivacion": (
@@ -212,7 +229,7 @@ LEGAL_MAPPING = {
     },
     "MX_MONTO": {
         "descripcion": "Monto o cantidad económica",
-        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO",
+        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO",
         "motivacion": (
             "Dato patrimonial de la persona física. "
             "Su revelación vulnera la esfera económica y privada del titular."
@@ -220,7 +237,7 @@ LEGAL_MAPPING = {
     },
     "MX_PLACA": {
         "descripcion": "Placa vehicular",
-        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO",
+        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO",
         "motivacion": (
             "Dato patrimonial que identifica un bien mueble registrado a nombre de una persona física. "
             "Permite rastrear movimientos y ubicación habitual del titular."
@@ -228,7 +245,7 @@ LEGAL_MAPPING = {
     },
     "MX_VIN": {
         "descripcion": "Número de Identificación Vehicular (VIN/NIV)",
-        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO",
+        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO",
         "motivacion": (
             "Identificador único del vehículo registrado a nombre del titular. "
             "Dato patrimonial confidencial."
@@ -321,7 +338,7 @@ LEGAL_MAPPING = {
     # ── MANUAL / GENÉRICO ─────────────────────────────────────────────────────
     "MANUAL": {
         "descripcion": "Dato clasificado manualmente por el responsable",
-        "fundamento": "Arts. 110 y 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO",
+        "fundamento": "Arts. 110 y 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO",
         "motivacion": (
             "Dato testado por revisión manual del oficial de privacidad o del "
             "responsable del tratamiento conforme a su criterio de clasificación."
@@ -329,7 +346,7 @@ LEGAL_MAPPING = {
     },
     "UNKNOWN": {
         "descripcion": "Dato personal diverso",
-        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO",
+        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO",
         "motivacion": (
             "Información concerniente a una persona física identificada o identificable "
             "que no corresponde a una categoría específica listada."
@@ -340,7 +357,7 @@ LEGAL_MAPPING = {
     "MX_CRIP": {
         "descripcion": "Clave de Registro de Identidad Personal (CRIP)",
         "fundamento": (
-            "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO; "
+            "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO; "
             "Ley General de Población, Art. 85 Bis; "
             "Código Civil Federal, Arts. 55 y 389"
         ),
@@ -354,7 +371,7 @@ LEGAL_MAPPING = {
     "MX_LUGAR_NAC": {
         "descripcion": "Lugar de nacimiento (localidad, municipio, entidad, país)",
         "fundamento": (
-            "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO; "
+            "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO; "
             "Código Civil Federal, Arts. 55 y 58 (contenido del acta de nacimiento)"
         ),
         "motivacion": (
@@ -367,7 +384,7 @@ LEGAL_MAPPING = {
     "MX_NACIONALIDAD": {
         "descripcion": "Nacionalidad del titular o de sus padres",
         "fundamento": (
-            "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO; "
+            "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO; "
             "Código Civil Federal, Art. 58, Fracción IV"
         ),
         "motivacion": (
@@ -380,7 +397,7 @@ LEGAL_MAPPING = {
     "MX_SEXO": {
         "descripcion": "Sexo del registrado",
         "fundamento": (
-            "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO; "
+            "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO; "
             "Código Civil Federal, Art. 58, Fracción II"
         ),
         "motivacion": (
@@ -407,7 +424,7 @@ LEGAL_MAPPING = {
     "MX_QR": {
         "descripcion": "Código QR con datos personales codificados",
         "fundamento": (
-            "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO"
+            "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO"
         ),
         "motivacion": (
             "Los códigos QR en documentos oficiales (INE, CSF, actas) codifican datos personales "
@@ -420,7 +437,7 @@ LEGAL_MAPPING = {
     # ── IDENTIFICADORES ADICIONALES ──────────────────────────────────────────
     "MX_NOMBRE": {
         "descripcion": "Nombre completo de persona física (campo estructurado)",
-        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO",
+        "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO",
         "motivacion": (
             "Nombre de persona física extraído de campos estructurados de documentos oficiales "
             "(CSF, INE, actas). Dato personal de identificación directa."
@@ -429,7 +446,7 @@ LEGAL_MAPPING = {
     "MX_IDCIF": {
         "descripcion": "Identificador de Cédula de Identificación Fiscal (idCIF)",
         "fundamento": (
-            "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO; "
+            "Art. 116 de la LGTAIP; Art. 3, Fracción IX de la LGPDPPSO; "
             "Código Fiscal de la Federación (CFF), Art. 27"
         ),
         "motivacion": (

@@ -68,6 +68,40 @@ def _detectar_cv2(gray, zoom: float):
     return salida
 
 
+def _detectar_barras(gray, zoom: float):
+    """Detección de códigos de barra 1D con cv2.barcode.BarcodeDetector.
+
+    Devuelve [(rect, texto), ...] con el MISMO mapeo de coordenadas que _detectar_cv2.
+    Si el módulo `cv2.barcode` no está disponible en esta build de OpenCV, devuelve [].
+    """
+    import cv2
+
+    try:
+        det = cv2.barcode.BarcodeDetector()
+    except (AttributeError, cv2.error):
+        # Algunas builds de OpenCV no incluyen el módulo barcode.
+        return []
+
+    try:
+        # detectAndDecodeWithType -> (retval, decoded_info, decoded_type, points)
+        # points: array (N, 4, 2) con los 4 vértices de cada código en píxeles.
+        # Usamos la variante WithType porque en OpenCV 4.10 (Python) expone el
+        # bool `retval`, mientras que detectAndDecode() omite ese flag.
+        ok, infos, _tipos, puntos = det.detectAndDecodeWithType(gray)
+    except cv2.error:
+        return []
+
+    if not ok or puntos is None or len(puntos) == 0:
+        return []
+
+    salida = []
+    for i, quad in enumerate(puntos):
+        rect = _puntos_a_rect(quad, zoom)
+        texto = infos[i] if infos is not None and i < len(infos) else ""
+        salida.append((rect, texto))
+    return salida
+
+
 def detectar_qr(page: pymupdf.Page, zoom: float = _ZOOM) -> list[dict]:
     """
     Detecta códigos QR en una página y los devuelve como entidades testables.
@@ -83,10 +117,15 @@ def detectar_qr(page: pymupdf.Page, zoom: float = _ZOOM) -> list[dict]:
         logger.exception("No se pudo rasterizar la página para detección de QR")
         return []
 
-    detecciones = _detectar_cv2(gray, zoom)
+    # QR (cv2.QRCodeDetector) y códigos de barra 1D (cv2.barcode) se testan bajo
+    # la MISMA etiqueta MX_QR (decisión del usuario). Marcamos el placeholder según
+    # el origen para distinguir el texto cuando la decodificación falla.
+    detecciones = [(r, t, "[Código QR]") for r, t in _detectar_cv2(gray, zoom)]
+    detecciones += [(r, t, "[Código de barras]")
+                    for r, t in _detectar_barras(gray, zoom)]
 
     entidades: list[dict] = []
-    for rect, texto in detecciones:
+    for rect, texto, placeholder in detecciones:
         # Descarta detecciones degeneradas (área nula)
         if rect.width <= 0 or rect.height <= 0:
             continue
@@ -98,7 +137,7 @@ def detectar_qr(page: pymupdf.Page, zoom: float = _ZOOM) -> list[dict]:
         entidades.append({
             "entity_type": "MX_QR",
             "score": 1.0,
-            "text": texto_limpio[:80] if texto_limpio else "[Código QR]",
+            "text": texto_limpio[:80] if texto_limpio else placeholder,
             "rects": [rect],
         })
 
