@@ -1550,7 +1550,8 @@ def _build_analyzer_impl() -> AnalyzerEngine:
                 regex=(
                     r"(?i)NOMBRE\s+(?:SEXO\s*[HM]?\s+)?"
                     r"(?-i:[A-ZÁÉÍÓÚÑ]{2,}(?:\s+[A-ZÁÉÍÓÚÑ]{2,}){1,3})"
-                    r"(?=\s+(?:DOMICILIO|CLAVE|CURP|FECHA|SECCI|VIGENCIA|$))"
+                    r"(?=\s+(?:DOMICILIO|CLAVE|CURP|RFC|NSS|FECHA|SECCI|VIGENCIA|"
+                    r"ENTIDAD|PRESENTE|CERTIFICAD|NACIONALIDAD|SEXO)\b|\s*$)"
                 ),
                 score=0.88,
             ),
