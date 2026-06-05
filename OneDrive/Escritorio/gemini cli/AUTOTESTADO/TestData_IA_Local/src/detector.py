@@ -84,6 +84,9 @@ _ETIQUETAS_LABEL = (
     r"|IMPUTADO|IMPUTADA|ACUSADO|ACUSADA|SENTENCIADO|SENTENCIADA"
     r"|V[Ií]CTIMA|OFENDIDO|OFENDIDA|AGRAVIADO|AGRAVIADA"
     r"|TESTIGO|DENUNCIANTE|QUEJOSO|QUEJOSA"
+    r"|APELANTE|RECURRENTE|COADYUVANTE|ALBACEA|HEREDERO|HEREDERA|LEGATARIO|LEGATARIA"
+    r"|CESIONARIO|CESIONARIA|CEDENTE|OTORGANTE|FIADOR|FIADORA|DEUDOR\s+SOLIDARIO"
+    r"|ARRENDADOR|ARRENDADORA|ARRENDATARIO|ARRENDATARIA|COMPARECIENTE|DECLARANTE"
     r"|ACTOR|ACTORA|DEMANDADO|DEMANDADA|TERCERO\s+INTERESADO"
     r"|REGISTRADO|REGISTRADA|MADRE|PADRE|PROGENITOR|PROGENITORA"
     r"|C[Oó]NYUGE|ESPOSO|ESPOSA|HIJO|HIJA|TUTOR|TUTORA|ABUELO|ABUELA"
@@ -189,10 +192,17 @@ _RE_CTX_DOMICILIO = re.compile(
     r'calle|avenida|av\.?|boulevard|blvd\.?|calzada|calz\.?|carretera|camino|'
     r'cerrada|privada|circuito|cto\.?|fraccionamiento|fracc\.?|retorno|andador|'
     r'pasaje|paseo|anillo|ronda|prolongaci[oó]n|prol\.?|transversal|viaducto|'
+    # Tipos de vialidad adicionales (Catálogo SEPOMEX/INEGI Norma Técnica de Domicilios Geográficos)
+    r'eje\s+vial|diagonal|peatonal|continuaci[oó]n|terracer[ií]a|brecha|'
+    r'vereda|callej[oó]n|cda\.?|circunvalaci[oó]n|perif[eé]rico|corredor|'
     # Tipos de asentamiento
     r'colonia|col\.?|condominio|unidad\s+habitacional|u\.?\s*h\.?|residencial|'
     r'barrio|bo\.?|ejido|rancher[ií]a|pueblo|sector|supermanzana|'
     r'conjunto\s+habitacional|villa|'
+    # Tipos de asentamiento adicionales (Catálogo INEGI/SEPOMEX de Asentamientos Humanos)
+    r'parque\s+industrial|corredor\s+industrial|zona\s+industrial|ciudad\s+industrial|'
+    r'paraje|hacienda|exhacienda|granja|cant[oó]n|cuartel|ingenio|congregaci[oó]n|'
+    r'rinconada|coto|zona\s+federal|ampliaci[oó]n|'
     # Elementos numerados
     r'manzana|mza\.?|lote|lt\.?|interior|int\.?|n[uú]mero|n[uú]m\.?|'
     r'piso|planta|departamento|depto\.?|apto\.?|apartamento|casa|esquina|esq\.?|'
@@ -232,7 +242,11 @@ _RE_CTX_ORIGEN_ETNICO = re.compile(
     r'de\s+origen|perteneciente\s+a|miembro\s+de|integrante\s+de|descendiente\s+de|'
     r'pueblos\s+originarios|comunidades\s+ind[ií]genas|autoidentificaci[oó]n|'
     r'lengua\s+materna|idioma\s+materno|costumbres|tradiciones|cultura\s+ind[ií]gena|'
-    r'diversidad\s+[eé]tnica|comunidades\s+ancestrales)\b',
+    r'diversidad\s+[eé]tnica|comunidades\s+ancestrales|'
+    # Origen racial o étnico (art. 3 LFPDPPP / art. 3 LGPDPPSO, dato sensible)
+    r'origen\s+racial|origen\s+[eé]tnico|afromexican[oa]|afrodescendiente|'
+    r'mestiz[oa]|pueblo\s+ind[ií]gena|naci[oó]n\s+ind[ií]gena|grupo\s+[eé]tnico|'
+    r'lengua\s+ind[ií]gena|hablante\s+de\s+lengua)\b',
     re.IGNORECASE,
 )
 _RE_CTX_RELIGION = re.compile(
@@ -241,7 +255,12 @@ _RE_CTX_RELIGION = re.compile(
     r'de\s+religi[oó]n|confesi[oó]n\s+religiosa|afiliaci[oó]n\s+religiosa|'
     r'profesi[oó]n\s+de\s+fe|credo|sinagoga|mezquita|monasterio|convento|'
     r'orden\s+religiosa|sacerdote|sacerdotisa|di[aá]cono|rabino|im[aá]n|'
-    r'ap[oó]stata|conversi[oó]n|bautizado|bautizada|confirmado|confirmada)\b',
+    r'ap[oó]stata|conversi[oó]n|bautizado|bautizada|confirmado|confirmada|'
+    # Creencias religiosas, filosóficas y morales (art. 3 LFPDPPP / LGPDPPSO)
+    r'creencias\s+religiosas|creencias\s+filos[oó]ficas|creencias\s+morales|'
+    r'convicciones\s+religiosas|libertad\s+de\s+culto|objeci[oó]n\s+de\s+conciencia|'
+    r'ate[oa]|agn[oó]stic[oa]|laic[oa]|cristian[oa]|cat[oó]lic[oa]|evang[eé]lic[oa]|'
+    r'protestante|jud[ií]o|jud[ií]a|musulm[aá]n|musulmana|budista)\b',
     re.IGNORECASE,
 )
 _RE_CTX_OPINION_POLITICA = re.compile(
@@ -250,7 +269,11 @@ _RE_CTX_OPINION_POLITICA = re.compile(
     r'ideolog[ií]a|tendencia\s+pol[ií]tica|filiaci[oó]n\s+pol[ií]tica|'
     r'coalici[oó]n|precandidatur[ao]|candidatur[ao]|disidente\s+pol[ií]tic[oa]|'
     r'preso\s+pol[ií]tic[oa]|exiliado\s+pol[ií]tic[oa]|persecuci[oó]n\s+pol[ií]tica|'
-    r'conservador|progresista|revolucionari[oa]|populista|libertari[oa])\b',
+    r'conservador|progresista|revolucionari[oa]|populista|libertari[oa]|'
+    # Afiliación sindical y opiniones políticas (art. 3 LFPDPPP, dato sensible)
+    r'afiliaci[oó]n\s+sindical|sindicato|sindicalizad[oa]|gremio|'
+    r'opini[oó]n\s+pol[ií]tica|opiniones\s+pol[ií]ticas|activista\s+pol[ií]tic[oa]|'
+    r'movimiento\s+social|agrupaci[oó]n\s+pol[ií]tica)\b',
     re.IGNORECASE,
 )
 _RE_CTX_PREFERENCIA_SEXUAL = re.compile(
@@ -286,7 +309,13 @@ _RE_CTX_DIAGNOSTICO = re.compile(
     r'aquejado\s+de|aquejada\s+de|afectado\s+de|afectada\s+de|'
     r'antecedentes\s+m[eé]dicos|antecedentes\s+patol[oó]gicos|'
     r'cuadro\s+cl[ií]nico|cuadro\s+sinto|pron[oó]stico|secuela|'
-    r'comorbilidad|certificado\s+m[eé]dico|informe\s+m[eé]dico)\b',
+    r'comorbilidad|certificado\s+m[eé]dico|informe\s+m[eé]dico|'
+    # Términos del expediente clínico (NOM-004-SSA3-2012)
+    r'nota\s+de\s+evoluci[oó]n|nota\s+de\s+ingreso|resumen\s+cl[ií]nico|'
+    r'impresi[oó]n\s+diagn[oó]stica|diagn[oó]stico\s+presuntivo|'
+    r'diagn[oó]stico\s+definitivo|padecimiento\s+actual|exploraci[oó]n\s+f[ií]sica|'
+    r'signos\s+vitales|plan\s+de\s+manejo|hoja\s+de\s+egreso|alta\s+m[eé]dica|'
+    r'enfermedad\s+actual|patolog[ií]a|terap[eé]utic[ao]|medicaci[oó]n)\b',
     re.IGNORECASE,
 )
 
