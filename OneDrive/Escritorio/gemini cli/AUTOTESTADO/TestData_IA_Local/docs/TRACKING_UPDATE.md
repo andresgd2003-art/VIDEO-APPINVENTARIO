@@ -1,4 +1,52 @@
-## ESTADO ACTUAL (2026-06-04 — Rebrand ANONIMA + Fix regresión OCR INE + Detección enriquecida)
+## ESTADO ACTUAL (2026-06-05 — Endurecimiento contra documento adversarial + sincronización de listas)
+
+### Sesión 2026-06-05 — Prueba de máxima dificultad, fusión MX_ESCOLAR y validación de contexto
+
+Sesión enfocada en robustez: pruebas con documentos reales (curp.pdf, CENEVAL EGEL.pdf) y un PDF adversarial generado a propósito, más la unificación del modelo de datos escolares y la validación exhaustiva del contexto.
+
+---
+
+#### 1. Documentos reales: curp.pdf y CENEVAL EGEL.pdf
+
+- **curp.pdf** (nativo): detecta CURP, nombre, entidad de registro y el domicilio/colonia/CP del pie de SEGOB. La firmante (servidora pública) NO se testa, por diseño.
+- **CENEVAL EGEL.pdf** (texto VECTORIAL, 0 texto nativo, solo un logo de 0.3%): **bug encontrado y corregido** — `_ocr_jpeg_embebidos` hacía OCR solo del logo diminuto y perdía todo el contenido. Fix: si las imágenes embebidas son diminutas (<12% máx, <15% total), cae a OCR de página completa que rasteriza y lee el texto vectorial. Tras el fix detecta nombre, folio y **matrícula** correctamente.
+
+#### 2. Fusión de matrícula en MX_ESCOLAR (dato escolar unificado)
+
+- A petición del usuario, `MX_MATRICULA` se **fusionó en `MX_ESCOLAR`**: un solo tipo de dato escolar que cubre **matrícula + institución educativa + carrera/programa**, sincronizado en las **4 listas** (detección `entidades_validas`/`_PRIORIDAD`, color `COLORES_ENTIDAD`, marcado manual `OPCIONES_TIPO_MANUAL`, acta `legal_mapper`).
+- Patrón de institución excluye entidades de gobierno (`Instituto Nacional Electoral/de Migración`); carrera/programa por etiqueta.
+
+#### 3. Auditoría de sincronización de las 4 listas (con agente)
+
+- Un agente auditor verificó que cada tipo de dato aparezca consistente en las 4 listas (detección/color/manual/acta). Resultado: matrícula/escolar faltaban en marcado manual → corregido. Juez/Secretario sin acta propia es intencional (se descartan antes de generarla).
+
+#### 4. Enriquecimiento y validación de contexto (con agentes + Brave MCP)
+
+- Un agente añadió términos de contexto (additivos sobre `_RE_CTX_*` y `_ETIQUETAS_LABEL`) basados en fuentes oficiales: **SEPOMEX/INEGI** (vialidades/asentamientos), **NOM-004-SSA3** (expediente clínico), **LGPDPPSO/LFPDPPP** (datos sensibles: creencias, afiliación sindical, origen racial), y **roles judiciales/notariales** (apelante, albacea, cesionario, fiador, arrendatario…).
+- El mismo agente **validó cada término con un script generador** de 455 frases en 6-9 variantes tipográficas (MAYÚSCULAS, minúsculas, Title Case, con/sin acentos, espacios extra, saltos de línea, con/sin dos puntos): **455/455 detectadas**. No hubo que ajustar regex — ya eran tolerantes (acentos opcionales `[oó]`, `\s+` cubre saltos de línea, `re.IGNORECASE`).
+
+#### 5. Prueba de MÁXIMA DIFICULTAD (PDF adversarial)
+
+Se generó `PRUEBA_BRUTAL_ANONIMA.pdf` (4 páginas) con datos de **checksum válido**, formatos mezclados, Title Case vs MAYÚSCULAS, acentos/sin acentos, saltos de línea entre etiqueta y valor, servidores públicos (NO testar) y trampas de falso positivo. Reveló y se corrigieron **6 bugs**:
+
+- **Falso positivo grave (`institucion_edu`):** "Universidad como concepto general…" se testaba porque **Presidio compila todos los patrones con IGNORECASE global**, así que `[A-Z]` casaba minúsculas. Fix: `(?-i:[A-ZÁÉÍÓÚÑ])` fuerza mayúscula REAL en la primera letra del nombre.
+- **Fusión de instituciones contiguas:** "Instituto Tecnológico de Durango Escuela Secundaria…" en un solo span → lookahead negativo de cabeceras (Universidad/Escuela/Instituto…) para no encadenar otra institución.
+- **Servidor público no filtrado:** "La Secretaria NOMBRE certificó" (secretaria de acuerdos judicial, sin calificador) se testaba → se añadió `Secretari[ao]` suelto a `_TITULOS_SERVIDOR`/`_RE_TITULO_PREVIO`.
+- **Autoridad no filtrada:** "Secretaría de Relaciones Exteriores" se testaba → se ampliaron los ministerios (Relaciones Exteriores, Hacienda, Marina, Defensa, Bienestar, Economía…).
+- **Prefijos sin recortar:** "Nombre del solicitante: X", "A nombre de: X" dejaban el prefijo en el recuadro. Causa: el prefijo narrativo `NOMBRE\s+` recortaba solo "Nombre " y, al casar, el fallback no corría. Fix: trims **en secuencia** (label → narrativo → `_RE_LABEL_COLON` genérico que recorta cualquier etiqueta terminada en ":"). Además `_RE_NARRATIVA_PREFIX` admite ":" opcional ("A nombre de:").
+- **Overmatch de nombre:** "GUADALUPE SANTOS RIVERA Fin" tragaba "Fin" → se ampliaron las palabras-límite `_STOP_NOMBRE` (Fin, Otra, Domicilio, Institución, Matrícula…).
+
+**Resultado del PDF brutal:** 54 entidades correctas, 0 falsos positivos en las trampas, servidores públicos protegidos. Procesado end-to-end en el VPS vía Flask.
+
+#### 6. Documentación (con agente)
+
+- Un agente documentó la sesión 2026-06-04 completa en este archivo (rebrand, despliegue VPS, regresión OCR INE, mejoras de detección, sincronización, contexto), en UTF-8 con acentos correctos.
+
+**Tests:** 117 passed, 1 xfailed, 2 xpassed tras todos los cambios. Sin regresiones. Commits clave de la sesión: `37dbf45` (fusión escolar + Title-Case + Paciente), `7693979` (contexto + tracking), `5a39ac6` (endurecimiento adversarial).
+
+---
+
+## ESTADO ANTERIOR (2026-06-04 — Rebrand ANONIMA + Fix regresión OCR INE + Detección enriquecida)
 
 ### Sesión 2026-06-04 — Rebrand, despliegue VPS, fix crítico de OCR de INE y mejoras de detección
 
