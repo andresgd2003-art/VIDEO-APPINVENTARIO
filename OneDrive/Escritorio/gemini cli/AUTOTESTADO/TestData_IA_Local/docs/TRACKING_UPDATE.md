@@ -1,4 +1,55 @@
-## ESTADO ACTUAL (2026-06-05 — Endurecimiento contra documento adversarial + sincronización de listas)
+## ESTADO ACTUAL (2026-06-05 — Equipo de agentes: huecos de detección, códigos de barra, marco legal 2025 y guardia anti-regresión)
+
+### Sesión 2026-06-05 (cont.) — Equipo de 3 agentes orquestados + integración y validación local/VPS
+
+Se orquestó un **equipo de 3 agentes con scopes de archivo no solapados** (para trabajo paralelo sin conflicto), más una ronda intensa de prevención de regresiones y validación en ambos entornos.
+
+---
+
+#### 1. Agente de DETECCIÓN (detector.py) — huecos cerrados
+
+Huecos confirmados con documentos reales y cerrados (additivos, sin tocar prioridades ni `_resolver_overlaps`):
+
+- **MX_LUGAR_NAC:** lookahead relajado — antes exigía `(LOCALIDAD|PADRES|DATOS|NOMBRE)` y fallaba si seguía "Sexo:"; ahora tolera también `SEXO|NACIONALIDAD|CURP|fin de línea`.
+- **MX_NACIONALIDAD:** `NACIONALIDAD\s+` → `NACIONALIDAD\s*:?\s+` (matchea "Nacionalidad: MEXICANA"); se conserva el filtro de FP genérico.
+- **MX_MONTO:** tolera espacio tras `$`, montos grandes con varias comas y sufijo `M.N.` ("$ 1,250,340.00 M.N.").
+- **MX_DOMICILIO (vialidad):** patrones `vialidad_etiqueta` y `vialidad_tipo_numero` (EJE VIAL/Calz/Priv/Cda/Diagonal/Peatonal con número desnudo); exigen número para no capturar "calle" en oraciones genéricas.
+- **MX_NOMBRE (roles judiciales):** añadidos a `etiqueta_titular` — Albacea, Coadyuvante, Heredero/a, Legatario/a, Cesionario/a, Cedente, Otorgante, Compareciente.
+- **Nombre de constancia CURP determinista:** `nombre_credencial_ine` amplía su lookahead con `ENTIDAD|RFC|NSS|PRESENTE|CERTIFICAD|NACIONALIDAD` → "Nombre ANDRES GALLEGOS DIAZ Entidad de registro" se detecta sin depender de GLiNER (variaba entre local y VPS).
+
+#### 2. Agente de CÓDIGOS DE BARRA (qr_detector.py)
+
+- Los **códigos de barra 1D** (CODE128, EAN...) se testan bajo la **MISMA etiqueta `MX_QR`** que los QR (decisión del usuario).
+- Implementado con `cv2.barcode.BarcodeDetector().detectAndDecodeWithType` (API confirmada con Brave: en este binding `detectAndDecode` solo devuelve 3 valores, por eso se usa `detectAndDecodeWithType`). Tolerante a builds de OpenCV sin el módulo `barcode` (try/except); no rompe la detección de QR ni la firma pública.
+
+#### 3. Agente LEGAL (legal_mapper.py, legal_packs/) — con Brave
+
+- **Reforma estructural federal CONFIRMADA:** el DECRETO del DOF **20-mar-2025** (vigente 21-mar-2025) expidió una **LGTAIP nueva** y una **LGPDPPSO nueva** (mismas siglas), abrogó las anteriores y **extinguió al INAI**.
+- **Art. 116 (información confidencial): vigente, sin cambio de número.** **Dato personal = Art. 3 Fr. IX** en la nueva LGPDPPSO → **corregidas 28 citas** de "Fracción XI" → "Fracción IX" en `legal_mapper.py`.
+- **Durango (DEC.365/366, 27-dic-2025):** Art. 110 y Art. 7 verificados contra PDF oficial; Art. 3/15 anotados como pendientes de cotejo (texto aún no indexado), sin inventar.
+- **Nuevo León (2019):** Art. 3 Fr. X/XI, Art. 22 y Art. 141 verificados; vigente, sin armonizar aún con la reforma federal 2025.
+- Creado **`legal_packs/REFERENCIAS_LEYES.md`** con nombre vigente, última reforma, artículos clave y URL oficial de cada ley (General, Durango, Nuevo León — transparencia y datos).
+
+#### 4. Guardia anti-regresión y robustez de la suite (lo que pidió el usuario)
+
+- **`tests/test_regresion_docs.py`:** invariantes a nivel documento sobre los 3 PDFs reales (brutal, INE, curp): **MUST-DETECT** (anti bajo-detección) y **MUST-NOT-DETECT** (anti falso-positivo: autoridades, servidores públicos, relleno). Más robusto que un snapshot exacto.
+- **Fixture AUTO-SANABLE:** se descubrió que `test_06/07/08/09` hacen `sys.modules["easyocr"] = MagicMock()` a nivel de módulo, **envenenando el OCR del INE para TODA la sesión** (el INE devolvía vacío en la suite completa pero pasaba en aislamiento). La guardia ahora **restaura el `easyocr` real** en sys.modules, re-vincula `ocr_engine.easyocr` y resetea los singletons del reader y del analyzer → inmune a esa contaminación.
+- Nuevos tests permanentes: `test_deteccion_gaps.py` (21 casos por hueco) y `test_barcode.py` (7 casos).
+
+#### 5. Incidente OneDrive — 47 tests borrados, restaurados
+
+- Durante la sesión, **OneDrive borró del disco 47 archivos de test** (git tenía 50, quedaban 3). Detectado porque los agentes reportaron "no existen los tests". **Restaurados desde git HEAD** sin tocar el trabajo en curso de los agentes (solo `git checkout HEAD -- tests/`). Todo commiteado de inmediato para blindarlo.
+
+#### 6. Validación en AMBOS entornos
+
+- **Local:** suite completa **395 passed**, 0 failed, 19 skipped, 4 xfailed, 3 xpassed.
+- **VPS (148.230.82.14):** se detuvo la app para liberar RAM, se corrió la **misma lógica de invariantes** (script equivalente adaptado a rutas Linux, `HOME=/opt/stingtest` para la cache de GLiNER) sobre los 3 docs → **TODO OK** (brutal 57 ent., INE 9, curp 6; todas las invariantes MUST-DETECT/MUST-NOT pasan). App reiniciada y UP en `:7080`.
+
+**Commits de la sesión:** `005ec00` (integración equipo + restauración tests + guardia), `1f2e144` (nombre constancia CURP determinista). Marco legal, detector, qr_detector y legal_packs desplegados en el VPS.
+
+---
+
+## ESTADO ANTERIOR (2026-06-05 — Endurecimiento contra documento adversarial + sincronización de listas)
 
 ### Sesión 2026-06-05 — Prueba de máxima dificultad, fusión MX_ESCOLAR y validación de contexto
 
