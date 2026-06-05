@@ -85,6 +85,8 @@ _ETIQUETAS_LABEL = (
     r"|V[Ií]CTIMA|OFENDIDO|OFENDIDA|AGRAVIADO|AGRAVIADA"
     r"|TESTIGO|DENUNCIANTE|QUEJOSO|QUEJOSA"
     r"|ACTOR|ACTORA|DEMANDADO|DEMANDADA|TERCERO\s+INTERESADO"
+    r"|REGISTRADO|REGISTRADA|MADRE|PADRE|PROGENITOR|PROGENITORA"
+    r"|C[Oó]NYUGE|ESPOSO|ESPOSA|HIJO|HIJA|TUTOR|TUTORA|ABUELO|ABUELA"
     r"|CONTRIBUYENTE|NOMBRE\s*\(S\)|NOMBRE|APELLIDO\s+PATERNO|APELLIDO\s+MATERNO"
     r"|PRIMER\s+APELLIDO|SEGUNDO\s+APELLIDO"
     r"|RAZ[Oó]N\s+SOCIAL|RFC|CURP|NSS|CLABE|IDCIF"
@@ -354,6 +356,18 @@ _RE_ETIQUETAS_CAMPO = re.compile(
     re.IGNORECASE,
 )
 
+# Palabras comunes (sustantivos/roles) que GLiNER/spaCy a veces etiqueta como
+# nombre propio pero NO lo son. Se descartan si el span es exactamente una de ellas.
+_RE_NO_NOMBRE = re.compile(
+    r'^(?:paciente|sustentante|titular|sujeto|persona|interesad[oa]|solicitante|'
+    r'usuari[oa]|cliente|alumn[oa]|estudiante|aspirante|contribuyente|'
+    r'beneficiari[oa]|asegurad[oa]|trabajador[a]?|emplead[oa]|ciudadan[oa]|'
+    r'declarante|compareciente|promovente|tercer[oa]|menor|adulto|adolescente|'
+    r'responsable|representante|apoderad[oa]|funcionari[oa]|servidor[a]?|'
+    r'diagn[oó]stico|tratamiento|expediente|documento|registro)$',
+    re.IGNORECASE,
+)
+
 # PERSON con más de 6 palabras probablemente no es un nombre
 _MAX_PALABRAS_NOMBRE = 6
 
@@ -436,12 +450,16 @@ def _filtrar_falsos_positivos(resultados: list, texto: str) -> list:
                 limpios.append(r)
             continue
 
-        # ── MX_MATRICULA: recortar ":/espacios" iniciales para tapar solo el valor ──
-        if r.entity_type == "MX_MATRICULA":
-            m_lead = re.match(r"^[\s:]+", texto[r.start:r.end])
-            if m_lead:
+        # ── MX_ESCOLAR: recortar etiqueta ("carrera:"/"programa:") o ":/espacios"
+        # iniciales (matrícula) para tapar solo el valor ──
+        if r.entity_type == "MX_ESCOLAR":
+            m_esc = re.match(
+                r"^(?:(?:carrera|programa\s+educativo|licenciatura(?:\s+en)?)\s*:?\s*|[\s:]+)",
+                texto[r.start:r.end], re.IGNORECASE,
+            )
+            if m_esc and m_esc.end() > 0:
                 try:
-                    r.start = r.start + m_lead.end()
+                    r.start = r.start + m_esc.end()
                 except Exception:
                     pass
                 fragmento = texto[r.start:r.end].strip()
@@ -617,6 +635,9 @@ def _filtrar_falsos_positivos(resultados: list, texto: str) -> list:
                 continue
             # Rol legal genérico ("el demandado", "la víctima", etc.)
             if _RE_ROLES_LEGALES.match(fragmento.strip()):
+                continue
+            # Palabra común suelta mal etiquetada como nombre ("Paciente", "Titular"…)
+            if _RE_NO_NOMBRE.match(fragmento.strip()):
                 continue
             # POS tags de spaCy: span sin PROPN o dominado por NOUN/VERB no es un nombre
             if not _es_nombre_propio_por_pos(fragmento):
@@ -809,14 +830,36 @@ def _build_analyzer_impl() -> AnalyzerEngine:
             supported_language="es",
         ),
         PatternRecognizer(
-            supported_entity="MX_MATRICULA",
+            supported_entity="MX_ESCOLAR",
             patterns=[
-                # "Matrícula: 2109262" / "Matricula 2109262" — ID escolar/institucional.
+                # Matrícula / folio escolar: "Matrícula: 2109262" — dato escolar.
                 # Lookbehind fijo (Matr[ií]cula = 9 chars) → captura solo el valor.
                 Pattern(
                     name="matricula_label",
                     regex=r"(?i)(?<=Matr[ií]cula)\s*:?\s*[A-Z0-9]{5,12}\b",
                     score=0.85,
+                ),
+                # Institución educativa del titular. Se EXCLUYE "Instituto Nacional X"
+                # (gobierno) al exigir Tecnológico/Politécnico tras "Instituto".
+                Pattern(
+                    name="institucion_edu",
+                    regex=(
+                        r"(?i)\b(?:Universidad|Escuela|Colegio|Facultad|Centro\s+Universitario|"
+                        r"Instituto\s+Tecnol[oó]gico|Instituto\s+Polit[eé]cnico|Preparatoria|"
+                        r"Bachillerato|Normal\s+Superior|Tecnol[oó]gico\s+(?:de|Nacional))"
+                        r"(?:\s+(?:de|del|la|los|las|y|en)\b|\s+[A-ZÁÉÍÓÚÑ][\wÁÉÍÓÚÑáéíóúñ]*){1,7}"
+                    ),
+                    score=0.7,
+                ),
+                # Carrera / programa educativo / licenciatura (etiqueta + valor en
+                # MAYÚSCULAS). El prefijo de etiqueta se recorta en el filtro.
+                Pattern(
+                    name="carrera_programa",
+                    regex=(
+                        r"(?i)(?:carrera|programa\s+educativo|licenciatura(?:\s+en)?)\s*:?\s*"
+                        r"(?-i:[A-ZÁÉÍÓÚÑ]{3,}(?:\s+[A-ZÁÉÍÓÚÑ]{2,}){0,4})"
+                    ),
+                    score=0.6,
                 ),
             ],
             supported_language="es",
@@ -1275,6 +1318,24 @@ def _build_analyzer_impl() -> AnalyzerEngine:
     # (?!\s*:) evita tragarse la etiqueta del campo siguiente ("CURP:", "RFC:", etc.)
     _NOMBRE_CAPS = r"(?-i:[A-ZÁÉÍÓÚÑ]{2,}(?:\s+(?![A-ZÁÉÍÓÚÑ]+\s*:)[A-ZÁÉÍÓÚÑ]{2,}){1,3})"
 
+    # Nombre en MAYÚSCULAS *o* Title Case ("Eva Gallegos Diaz" / "EVA GALLEGOS DIAZ").
+    # Cada palabra empieza con mayúscula seguida de letras. Se detiene antes de
+    # palabras-límite que son etiquetas/roles del siguiente campo (Menor, Juez,
+    # Victima, Lugar, Fecha, etc.) o de una etiqueta "Palabra:".
+    _STOP_NOMBRE = (
+        r"Menor|Imputad[oa]|Acusad[oa]|Sentenciad[oa]|V[ií]ctima|Ofendid[oa]|"
+        r"Agraviad[oa]|Juez|Jueza|Secretari[oa]|Testigo|Denunciante|Declarante|"
+        r"Quejos[oa]|Actor|Actora|Demandad[oa]|Lugar|Fecha|Datos|Domicilio|"
+        r"Nacionalidad|Estado|Municipio|Edad|Sexo|Tel[eé]fono|Correo|Pasaporte|"
+        r"Curp|Rfc|Nss|Ine|Clave|Registrad[oa]|Madre|Padre|Programa|Nombre|"
+        r"Vialidad|Numero|N[uú]mero|Fraccionamiento|Colonia|Entidad|El|La|Los|Las"
+    )
+    _NOMBRE_VAL = (
+        r"(?-i:[A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚÑáéíóúñ]+"
+        r"(?:\s+(?!(?:" + _STOP_NOMBRE + r")\b)(?![A-ZÁÉÍÓÚÑ]+\s*:)"
+        r"[A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚÑáéíóúñ]+){1,3})"
+    )
+
     recognizers.append(PatternRecognizer(
         supported_entity="MX_NOMBRE",
         patterns=[
@@ -1333,8 +1394,11 @@ def _build_analyzer_impl() -> AnalyzerEngine:
                     r"Arrendador|Arrendadora|Arrendatario|Arrendataria|"
                     r"Fiador|Fiadora|Avalista|Endosante|"
                     r"Asegurado|Asegurada|Beneficiario|Beneficiaria|"
-                    r"Trabajador|Trabajadora|Empleado|Empleada"
-                    r")\s*:\s+" + _NOMBRE_CAPS
+                    r"Trabajador|Trabajadora|Empleado|Empleada|"
+                    # Datos de acta de nacimiento / parentesco
+                    r"Registrado|Registrada|Madre|Padre|Progenitor|Progenitora|"
+                    r"C[oó]nyuge|Esposo|Esposa|Hijo|Hija|Tutor|Tutora|Abuelo|Abuela"
+                    r")\s*:\s+" + _NOMBRE_VAL
                 ),
                 score=0.92,
             ),
@@ -1346,7 +1410,7 @@ def _build_analyzer_impl() -> AnalyzerEngine:
                     r"(?i)(?:el\s+C\.|la\s+C\.|el\s+ciudadano|la\s+ciudadana|"
                     r"el\s+se[ñn]or|la\s+se[ñn]ora|el\s+sr\.|la\s+sra\.|"
                     r"el\s+lic\.|la\s+lic\.|c\.\s+)"
-                    + _NOMBRE_CAPS
+                    + _NOMBRE_VAL
                 ),
                 score=0.88,
             ),
@@ -1369,7 +1433,7 @@ def _build_analyzer_impl() -> AnalyzerEngine:
                     r"el\s+actor|la\s+actora|"
                     r"el\s+demandado|la\s+demandada|"
                     r"el\s+menor|la\s+menor)\s+"
-                    + _NOMBRE_CAPS
+                    + _NOMBRE_VAL
                 ),
                 score=0.85,
             ),
@@ -1380,7 +1444,7 @@ def _build_analyzer_impl() -> AnalyzerEngine:
                 regex=(
                     r"(?i)(?:de\s+nombre|de\s+nombres|conocido\s+como|conocida\s+como|"
                     r"identificado\s+como|identificada\s+como|llamado|llamada)\s+"
-                    + _NOMBRE_CAPS
+                    + _NOMBRE_VAL
                 ),
                 score=0.87,
             ),
@@ -1390,7 +1454,7 @@ def _build_analyzer_impl() -> AnalyzerEngine:
                 name="a_nombre_de",
                 regex=(
                     r"(?i)(?:A\s+nombre\s+de|Expedido\s+a|Emitido\s+a|Girado\s+a)"
-                    r"\s*:\s+" + _NOMBRE_CAPS
+                    r"\s*:\s+" + _NOMBRE_VAL
                 ),
                 score=0.90,
             ),
@@ -1486,7 +1550,7 @@ def analyze_page(analyzer: AnalyzerEngine, text: str) -> list:
         "MX_CLABE", "MX_NSS", "MX_CUENTA", "MX_PLACA", "MX_VIN", "MX_TARJETA", "MX_MONTO",
         "MX_TEL", "MX_CP", "MX_EMAIL", "MX_DOMICILIO", "MX_COLONIA", "MX_ENTIDAD_REGISTRO",
         "MX_FECHA_NAC", "MX_EDAD", "MX_DIAGNOSTICO", "MX_NOMBRE", "MX_IDCIF",
-        "MX_CRIP", "MX_LUGAR_NAC", "MX_NACIONALIDAD", "MX_SEXO", "MX_MATRICULA",
+        "MX_CRIP", "MX_LUGAR_NAC", "MX_NACIONALIDAD", "MX_SEXO", "MX_ESCOLAR",
         "MX_ORIGEN_ETNICO", "MX_RELIGION", "MX_OPINION_POLITICA", "MX_PREFERENCIA_SEXUAL", "MX_BIOMETRICO",
         "PERSON", "Persona", "Juez", "Secretario", "Diagnóstico", "Menor", "LOCATION",
     ]
@@ -1512,7 +1576,7 @@ _PRIORIDAD = {
     "MX_NSS": 8, "MX_PLACA": 8, "MX_FECHA_NAC": 8, "MX_EDAD": 7,
     "MX_MONTO": 7, "MX_CUENTA": 6,
     "MX_DOMICILIO": 8, "MX_COLONIA": 7, "MX_DIAGNOSTICO": 9, "MX_ENTIDAD_REGISTRO": 9,
-    "MX_MATRICULA": 9,
+    "MX_ESCOLAR": 9,
     "MX_TEL": 5, "MX_CP": 4,
     # Datos de acta de nacimiento
     "MX_LUGAR_NAC": 9, "MX_CRIP": 9,

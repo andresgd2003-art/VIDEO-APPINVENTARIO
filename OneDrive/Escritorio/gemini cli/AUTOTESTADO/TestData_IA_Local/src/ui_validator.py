@@ -123,7 +123,7 @@ COLORES_ENTIDAD: dict[str, str] = {
     "MX_FECHA_NAC": "#d35400",
     "MX_EDAD":      "#d35400",
     "MX_NSS":       "#8e44ad",
-    "MX_MATRICULA": "#8e44ad",
+    "MX_ESCOLAR":   "#8e44ad",
     # Domicilio / localización geográfica
     "MX_DOMICILIO":  "#1abc9c",
     "MX_COLONIA":    "#1abc9c",
@@ -200,6 +200,7 @@ OPCIONES_TIPO_MANUAL: dict[str, str] = {
     "Opinión Política":   "MX_OPINION_POLITICA",
     "Preferencia Sexual": "MX_PREFERENCIA_SEXUAL",
     "Biométrico":         "MX_BIOMETRICO",
+    "Dato escolar":       "MX_ESCOLAR",
     "Firma":              "MX_FIRMA",
     "Código QR":          "MX_QR",
     "Bancario / CLABE":   "MX_CLABE",

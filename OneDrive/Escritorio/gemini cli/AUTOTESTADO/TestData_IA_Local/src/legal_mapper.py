@@ -88,13 +88,14 @@ LEGAL_MAPPING = {
             "su revelación puede exponer historial laboral y de salud del titular."
         ),
     },
-    "MX_MATRICULA": {
-        "descripcion": "Matrícula / folio escolar o institucional",
+    "MX_ESCOLAR": {
+        "descripcion": "Dato escolar (matrícula, institución educativa, carrera o programa)",
         "fundamento": "Art. 116 de la LGTAIP; Art. 3, Fracción XI de la LGPDPPSO",
         "motivacion": (
-            "La matrícula identifica de forma única e individual al titular dentro de una "
-            "institución educativa o de un padrón. Es un dato personal que, asociado al nombre, "
-            "permite vincular trayectoria académica y acceder a sistemas y trámites del titular."
+            "La matrícula, institución educativa, carrera o programa que cursa el titular "
+            "constituye un dato personal de carácter académico. Asociado al nombre, identifica "
+            "de forma individual al titular, revela su trayectoria escolar y puede facilitar "
+            "su identificación, perfilamiento o el acceso a sistemas y trámites del titular."
         ),
     },
 
