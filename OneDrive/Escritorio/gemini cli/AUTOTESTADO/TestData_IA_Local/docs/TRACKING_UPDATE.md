@@ -1,4 +1,55 @@
-## ESTADO ACTUAL (2026-06-05 — Equipo de agentes: huecos de detección, códigos de barra, marco legal 2025 y guardia anti-regresión)
+## ESTADO ACTUAL (2026-06-06 — Reorganización coherente por ley + mejoras de UI, test-first)
+
+### Sesión 2026-06-06 — Agrupación legal coherente, acta, afiliación sindical y UX
+
+Trabajo bajo dos reglas del usuario: **test ANTES de aplicar cada cambio** (se creó
+`tests/test_organizacion.py` que codifica el estado objetivo y se ejecutó en rojo
+antes de implementar) y **documentar cada cambio**. 411 tests pasan al cierre.
+
+**Cambio 1 — Colores reorganizados por categoría legal (`ui_validator.COLORES_ENTIDAD` + leyenda).**
+Se eliminaron las incoherencias (el color `#8e44ad` salía 2 veces; "Diagnóstico" en
+2 filas; Preferencia Sexual junto a identificadores; Religión/Escolar junto a
+bancarios; Biométrico junto a fecha). Nueva agrupación:
+- Identidad (#e67e22): Persona/Nombre/Menor + **Lugar y Fecha de nacimiento, Edad,
+  Sexo, Nacionalidad** (antes dispersos).
+- Identificadores (#c0392b): CURP/RFC/INE/IDCIF/CRIP/Pasaporte/NSS.
+- Contacto y domicilio (#2980b9). Patrimonial (#8e44ad). Vehículo (#1a5276). Escolar (#b9770e).
+- Sensibles cada uno con color PROPIO: Salud #e74c3c, Origen étnico #a93226,
+  Religión #7d3c98, **Opinión política/afiliación #16a085**, Preferencia sexual #d81b60,
+  Biométrico #d35400. (Diagnóstico ya NO comparte color con Opinión política.)
+- **Firma + QR + códigos de barra (#34495e)**: misma categoría visual.
+- "Diagnóstico" (GLiNER) = MX_DIAGNOSTICO (mismo color, mismo concepto).
+- Leyenda reescrita: 15 grupos, sin duplicados.
+
+**Cambio 2 — Acta (`report_generator.py`).**
+- Ubicaciones SOLO por número de PÁGINA, ordenadas (`p.1, p.3`); se eliminó el renglón (`r.N`).
+- Se quitó la mención a "Presidio/GLiNER" de la nota al pie.
+
+**Cambio 3 — Detección de afiliación (`detector.py`, MX_OPINION_POLITICA).**
+Nuevos patrones: partido por nombre completo ("Partido Acción Nacional"), **afiliación
+sindical** ("Sindicato Nacional de Trabajadores", "afiliación sindical", "sindicalizado"),
+agrupados con Opinión Política. Verificado en doc brutal.
+
+**Cambio 4 — Barra de progreso debajo del texto de estado (`ui_validator.py`).**
+`pack(after=_etiqueta_estado, ...)`: la barra ya no salta al fondo del panel.
+
+**Cambio 5 — Refresco del conteo por página (`ui_validator.py`).**
+`_actualizar_conteo_pagina()` se invoca en `_navegar`: "N entidades totales · M en esta
+página" se actualiza al cambiar de página (antes quedaba congelado).
+
+**Cambio 6 — Ventana de carga (splash) al iniciar (`ui_validator.py`).**
+`_mostrar_splash_carga()`/`_cerrar_splash()`: ventana modal "Cargando modelo NLP…" con
+barra indeterminada al arrancar; bloquea el uso hasta que el modelo carga; se cierra
+sola al estar listo o al fallar. Texto actualizado por el pulso de carga.
+
+**Validación:** `test_organizacion.py` (16 invariantes) + suite completa **411 passed**,
+0 fallos. Verificado en VPS (página 3: conteo actualizado, navegación y clics OK,
+afiliación sindical detectada, servidores públicos sin testar). Commits: colores/acta/
+afiliación, y UI (splash/barra/conteo). Desplegado en el VPS.
+
+---
+
+## ESTADO ANTERIOR (2026-06-05 — Equipo de agentes: huecos de detección, códigos de barra, marco legal 2025 y guardia anti-regresión)
 
 ### Sesión 2026-06-05 (cont.) — Equipo de 3 agentes orquestados + integración y validación local/VPS
 
