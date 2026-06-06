@@ -250,6 +250,12 @@ class ValidadorPDFApp(ctk.CTk):
 
         self._construir_ui()
 
+        # Ventana de carga (splash) mientras carga el modelo NLP — bloquea el uso
+        # hasta que la herramienta esté lista.
+        self._splash = None
+        self._splash_lbl = None
+        self.after(50, self._mostrar_splash_carga)
+
         threading.Thread(target=self._hilo_init_analizador, daemon=True).start()
         self.after(200, self._monitorear_cola_init)
         self.after(1000, self._pulso_carga_modelo)
@@ -579,6 +585,65 @@ class ValidadorPDFApp(ctk.CTk):
 
     # ------------------------------------------------------------------ INICIALIZACIÓN
 
+    def _mostrar_splash_carga(self) -> None:
+        """Ventana modal de carga mostrada al iniciar mientras carga el modelo NLP."""
+        try:
+            sp = ctk.CTkToplevel(self)
+            sp.title("ANONIMA")
+            sp.resizable(False, False)
+            sp.configure(fg_color=COL_PANEL)
+            w, h = 440, 200
+            self.update_idletasks()
+            sw, sh = self.winfo_screenwidth(), self.winfo_screenheight()
+            x, y = max(0, (sw - w) // 2), max(0, (sh - h) // 2)
+            sp.geometry(f"{w}x{h}+{x}+{y}")
+            try:
+                sp.transient(self)
+            except Exception:
+                pass
+            ctk.CTkLabel(
+                sp, text="⬛ ANONIMA",
+                font=ctk.CTkFont(family="Georgia", size=24, weight="bold"),
+                text_color=COL_HEADER,
+            ).pack(pady=(28, 2))
+            self._splash_lbl = ctk.CTkLabel(
+                sp, text="Cargando modelo NLP…\nLa herramienta estará lista en unos momentos.",
+                font=ctk.CTkFont(family=FONT_FAMILY, size=12), text_color=COL_TEXT2,
+                justify="center",
+            )
+            self._splash_lbl.pack(pady=4)
+            pb = ctk.CTkProgressBar(sp, mode="indeterminate", progress_color="#0369A1")
+            pb.pack(pady=18, padx=36, fill="x")
+            pb.start()
+            sp.attributes("-topmost", True)
+            try:
+                sp.grab_set()   # modal: bloquea el uso de la app hasta cerrar
+            except Exception:
+                pass
+            # Si el modelo ya cargó antes de mostrar el splash, ciérralo de inmediato
+            if self._analizador is not None or self._error_modelo is not None:
+                self._splash = sp
+                self._cerrar_splash()
+            else:
+                self._splash = sp
+        except Exception:
+            self._splash = None
+
+    def _cerrar_splash(self) -> None:
+        """Cierra la ventana de carga (al estar listo el modelo o al fallar)."""
+        sp = getattr(self, "_splash", None)
+        if sp is not None:
+            try:
+                sp.grab_release()
+            except Exception:
+                pass
+            try:
+                sp.destroy()
+            except Exception:
+                pass
+            self._splash = None
+            self._splash_lbl = None
+
     def _hilo_init_analizador(self) -> None:
         try:
             analizador = _get_detector().build_analyzer()
@@ -596,6 +661,14 @@ class ValidadorPDFApp(ctk.CTk):
             text=f"{spinner} Cargando modelo NLP… ({self._modelo_carga_seg}s)\n"
                  "(La primera vez puede tardar 2-3 min descargando GLiNER)"
         )
+        if self._splash_lbl is not None:
+            try:
+                self._splash_lbl.configure(
+                    text=f"Cargando modelo NLP… ({self._modelo_carga_seg}s)\n"
+                         "La primera vez puede tardar 2-3 min."
+                )
+            except Exception:
+                pass
         self.after(1000, self._pulso_carga_modelo)
 
     def _monitorear_cola_init(self) -> None:
@@ -605,10 +678,12 @@ class ValidadorPDFApp(ctk.CTk):
             if etiqueta == "analizador_listo":
                 self._analizador = mensaje[1]
                 self._modelo_carga_seg = 0
+                self._cerrar_splash()
                 self._etiqueta_estado.configure(text="✅ Modelo listo — Sin analizar")
                 self._btn_cargar.configure(state="normal")
             elif etiqueta == "error_analizador":
                 self._error_modelo = mensaje[1]
+                self._cerrar_splash()
                 self._etiqueta_estado.configure(
                     text=f"⚠ Error al cargar modelo NLP — {mensaje[1][:80]}"
                 )
@@ -759,8 +834,23 @@ class ValidadorPDFApp(ctk.CTk):
             self._renderizar_pagina(self._pagina_actual)
             if self._pagina_actual in self._resultados_por_pagina:
                 self._redibujar_entidades()
+                self._actualizar_conteo_pagina()
             else:
                 self._etiqueta_estado.configure(text="Sin analizar")
+
+    def _actualizar_conteo_pagina(self) -> None:
+        """Refresca el texto de estado con el conteo de la PÁGINA ACTUAL.
+
+        Sin esto, '{n} en esta página' quedaba congelado en el valor de la página
+        donde terminó el análisis y no se actualizaba al cambiar de página.
+        """
+        if not self._resultados_por_pagina:
+            return
+        total = sum(len(v) for v in self._resultados_por_pagina.values())
+        n = len(self._resultados_por_pagina.get(self._pagina_actual, []))
+        self._etiqueta_estado.configure(
+            text=f"{total} entidades totales · {n} en esta página"
+        )
 
     def _actualizar_nav(self) -> None:
         if self._doc is None:
@@ -1159,7 +1249,8 @@ class ValidadorPDFApp(ctk.CTk):
         self._bloquear_botones_analisis()
         self._barra_progreso.configure(mode="determinate")
         self._barra_progreso.set(0)
-        self._barra_progreso.pack(pady=4, padx=8, fill="x")
+        # La barra va JUSTO DEBAJO del texto de estado (páginas/entidades), no al fondo.
+        self._barra_progreso.pack(after=self._etiqueta_estado, pady=(0, 6), padx=20, fill="x")
         self._etiqueta_estado.configure(text="Analizando documento…")
         self._analisis_en_curso = True
         threading.Thread(target=self._hilo_analisis_lote, daemon=True).start()
